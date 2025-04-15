@@ -18,3 +18,12 @@ public enum EnemyChoiceEnum
     Paper,
     Scissors,
 }
+
+public enum AttackTypeEnum
+{
+    none,
+    damage,
+    heal,
+    buff,
+    debuff,
+}

@@ -9,6 +9,7 @@ public class PlayerManager : MonoBehaviour
     
     [Header("Player Combat")]
     public int playerDamage = 1;
+    public int playerArmourPenetration = 0;
     public int playerDefense = 0;
     public int playerHealth = 3;
     
@@ -26,10 +27,13 @@ public class PlayerManager : MonoBehaviour
 
     public PlayerEnum playerEnum;
     public PlayerChoiceEnum playerChoiceEnum;
+
+    private PlayerCombat playerCombatScript;
     
     private int playerModifiedDamage;
     private int playerModifiedDefense;
     private int playerModifiedHealth;
+    private int playerModifiedArmourPenetration;
     private int playerCurrentScore;
 
     void Awake()
@@ -51,6 +55,10 @@ public class PlayerManager : MonoBehaviour
     public int GetPlayerHealth()
     {
         return playerModifiedHealth = playerHealth + equippedNecklace.itemHealth + equippedRing.itemHealth + equippedAmulet.itemHealth;
+    }
+    public int GetPlayerArmourPenetration()
+    {
+        return playerModifiedArmourPenetration = playerArmourPenetration + equippedNecklace.itemArmourPenetration + equippedRing.itemArmourPenetration + equippedAmulet.itemArmourPenetration;
     }
 
     // Score Section

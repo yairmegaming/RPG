@@ -24,6 +24,7 @@ public class Item : MonoBehaviour
 
     [Header("Item Stats")]
     public int itemDamage = 0;
+    public int itemArmourPenetration = 0;
     public int itemHealth = 0;
     public int itemDefense = 0;
 }
