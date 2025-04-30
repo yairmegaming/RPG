@@ -2,8 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Item : MonoBehaviour
+[CreateAssetMenu(menuName = "Item")]  // This attribute allows you to create instances of this class in the Unity editor
+public class Item : ScriptableObject
 {
+    [ Header("Item ID")]
+    public string itemID; 
+
     [Header("Item Name")]
     public string itemName = "Default Item";
     
@@ -25,6 +29,6 @@ public class Item : MonoBehaviour
     [Header("Item Stats")]
     public int itemDamage = 0;
     public int itemArmourPenetration = 0;
-    public int itemHealth = 0;
+    public int itemMaxHealth = 0;
     public int itemDefense = 0;
 }

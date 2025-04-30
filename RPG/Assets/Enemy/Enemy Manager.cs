@@ -1,72 +1,64 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
 {
     [Header("Current Enemy")]
     public GameObject enemyPrefab;
-    
-    // Enemy state
+
     private EnemyState enemyState;
     private EnemyChoiceEnum enemyChoiceEnum;
     private EnemyDefault enemyDefault;
 
     public EnemyState EnemyState
     {
-        get { return enemyState; }
-        set { enemyState = value; }
+        get => enemyState;
+        set => enemyState = value;
     }
+
     public EnemyChoiceEnum EnemyChoice
     {
-        get { return enemyChoiceEnum; }
-        set { enemyChoiceEnum = value; }
+        get => enemyChoiceEnum;
+        set => enemyChoiceEnum = value;
     }
 
     public int EnemyDamage
     {
-        get { return enemyDefault.EnemyDamage; }
-        set {  enemyDefault.EnemyDamage = value; }
+        get => enemyDefault.EnemyDamage;
+        set => enemyDefault.EnemyDamage = value;
     }
+
     public int EnemyHealth
     {
-        get { return enemyDefault.EnemyCurrentHealth ; }
-        set { EnemyHealth = value; }
+        get => enemyDefault.EnemyCurrentHealth;
+        set => enemyDefault.EnemyCurrentHealth = value;
     }
+
     public int EnemyDefense
     {
-        get { return enemyDefault.EnemyCurrentDefense; }
-        set { enemyDefault.EnemyCurrentDefense = value; }
-    }
-    public int GetEnemyScoreWorth
-    {
-        get { return enemyDefault.EnemyCurrentScoreWorth; }
-        set { enemyDefault.EnemyCurrentScoreWorth = value; }
+        get => enemyDefault.EnemyCurrentDefense;
+        set => enemyDefault.EnemyCurrentDefense = value;
     }
 
-    public GameObject SetEnemyPrefab
+    public int EnemyScoreWorth
     {
-        get { return enemyPrefab; }
-        set { enemyPrefab = value; }
+        get => enemyDefault.EnemyCurrentScoreWorth;
+        set => enemyDefault.EnemyCurrentScoreWorth = value;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        // Set the enemy choice to none at the start
         EnemyChoice = EnemyChoiceEnum.none;
         EnemyState = EnemyState.none;
     }
 
-    void Update()
+    private void Update()
     {
-        // Check if the enemy prefab is set
+        if (enemyPrefab == null) return;
+
+        enemyDefault = enemyPrefab.GetComponent<EnemyDefault>();
+
         switch (EnemyState)
         {
-            case EnemyState.none:
-                enemyDefault = enemyPrefab.GetComponent<EnemyDefault>();
-                break;
             case EnemyState.EnemyChoosing:
                 enemyDefault.EnemyChoosing();
                 break;
@@ -83,7 +75,6 @@ public class EnemyManager : MonoBehaviour
                 enemyDefault.EnemyDeathAnimation();
                 break;
         }
-
-    }  
+    }
 }
 

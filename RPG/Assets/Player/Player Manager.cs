@@ -1,73 +1,184 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class PlayerManager : MonoBehaviour
 {
+     [Header("Inventory")]
+    public List<Item> inventory = new List<Item>();
+
+    [Header("Equipped Items")]
+    public Item equippedNecklace;
+    public Item equippedRing;
+    public Item equippedAmulet;
+
     [Header("Player Visuals")]
-    public GameObject player;
-    
+    [SerializeField] private GameObject player;
+
     [Header("Player Combat")]
-    public int playerDamage = 1;
-    public int playerArmourPenetration = 0;
-    public int playerDefense = 0;
-    public int playerHealth = 3;
-    
+    [SerializeField] private int baseDamage = 1;
+    [SerializeField] private int baseArmourPenetration = 0;
+    [SerializeField] private int baseDefense = 0;
+    [SerializeField] private int baseMaxHealth = 3;
+
     [Header("Player Score")]
-    public int playerScore = 0;
+    [SerializeField] private int playerScore = 0;
 
     [Header("Player Items")]
-    public GameObject Necklace;
-    public GameObject Ring;
-    public GameObject Amulet;
+    [SerializeField] private GameObject necklace;
+    [SerializeField] private GameObject ring;
+    [SerializeField] private GameObject amulet;
 
-    private Necklace equippedNecklace;
-    private Ring equippedRing;
-    private Amulet equippedAmulet;
 
-    public PlayerStates playerEnum;
-    public PlayerChoiceEnum playerChoiceEnum;
+    private PlayerStates playerState;
+    private PlayerChoiceEnum playerChoice;
 
-    private PlayerCombat playerCombatScript;
-    
-    private int playerModifiedDamage;
-    private int playerModifiedDefense;
-    private int playerModifiedHealth;
-    private int playerModifiedArmourPenetration;
-    private int playerCurrentScore;
+    private int currentHealth;
 
-    void Awake()
+    private PlayerCombat PlayerCombat => player.GetComponent<PlayerCombat>();
+
+    private Item EquippedNecklace => necklace.GetComponent<Item>();
+    private Item EquippedRing => ring.GetComponent<Item>();
+    private Item EquippedAmulet => amulet.GetComponent<Item>();
+
+    public int ModifiedDamage => baseDamage + EquippedNecklace.itemDamage + EquippedRing.itemDamage + EquippedAmulet.itemDamage;
+    public int ModifiedDefense => baseDefense + EquippedNecklace.itemDefense + EquippedRing.itemDefense + EquippedAmulet.itemDefense;
+    public int ModifiedMaxHealth => baseMaxHealth + EquippedNecklace.itemMaxHealth + EquippedRing.itemMaxHealth + EquippedAmulet.itemMaxHealth;
+    public int ModifiedArmourPenetration => baseArmourPenetration + EquippedNecklace.itemArmourPenetration + EquippedRing.itemArmourPenetration + EquippedAmulet.itemArmourPenetration;
+
+    public int CurrentHealth
     {
-        equippedNecklace = Necklace.GetComponent<Necklace>();
-        equippedRing = Ring.GetComponent<Ring>();
-        equippedAmulet = Amulet.GetComponent<Amulet>();
+        get => currentHealth;
+        set => currentHealth = Mathf.Clamp(value, 0, ModifiedMaxHealth);
     }
 
-    // Player Stats Section
-    public int GetPlayerDamage()
+    public int PlayerScore
     {
-        return playerModifiedDamage = playerDamage + equippedNecklace.itemDamage + equippedRing.itemDamage + equippedAmulet.itemDamage;
-    }
-    public int GetPlayerDefense()
-    {
-        return playerModifiedDefense = playerDefense + equippedNecklace.itemDefense + equippedRing.itemDefense + equippedAmulet.itemDefense;
-    }
-    public int GetPlayerHealth()
-    {
-        return playerModifiedHealth = playerHealth + equippedNecklace.itemHealth + equippedRing.itemHealth + equippedAmulet.itemHealth;
-    }
-    public int GetPlayerArmourPenetration()
-    {
-        return playerModifiedArmourPenetration = playerArmourPenetration + equippedNecklace.itemArmourPenetration + equippedRing.itemArmourPenetration + equippedAmulet.itemArmourPenetration;
+        get => playerScore;
+        set => playerScore = value;
     }
 
-    // Score Section
-    public int GetPlayerScore()
+    public PlayerStates PlayerState
     {
-        return playerCurrentScore;
+        get => playerState;
+        set => playerState = value;
     }
-    public void AddToPlayerScore(int _score)
+
+    public PlayerChoiceEnum PlayerChoice
     {
-        playerCurrentScore += _score;
+        get => playerChoice;
+        set => playerChoice = value;
+    }
+
+    private void Awake()
+    {
+        InitializePlayer();
+    }
+
+    private void InitializePlayer()
+    {
+        CurrentHealth = ModifiedMaxHealth;
+        PlayerCombat.UpdatePlayerStats();
+        PlayerChoice = PlayerChoiceEnum.none;
+        PlayerState = PlayerStates.PlayerChoosing;
+    }
+
+    private void Update()
+    {
+        if (currentHealth <= 0)
+        {
+            PlayerState = PlayerStates.PlayerDied;
+        }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        PlayerCombat.TakeDamage(damage);
+        CurrentHealth = PlayerCombat.CurrentHealth;
+    }
+
+    public void Heal(int healAmount)
+    {
+        PlayerCombat.Heal(healAmount);
+        CurrentHealth = PlayerCombat.CurrentHealth;
+    }
+
+    public void Defend(int damage)
+    {
+        PlayerCombat.OnDefense(damage);
+    }
+
+    public void MakeChoice(PlayerChoiceEnum choice)
+    {
+        switch (choice)
+        {
+            case PlayerChoiceEnum.Rock:
+                PlayerCombat.RockChoice();
+                break;
+            case PlayerChoiceEnum.Paper:
+                PlayerCombat.PaperChoice();
+                break;
+            case PlayerChoiceEnum.Scissors:
+                PlayerCombat.ScissorsChoice();
+                break;
+            default:
+                PlayerCombat.ResetChoices();
+                break;
+        }
+    }
+
+    public void AddItemToInventory(Item item)
+    {
+        inventory.Add(item);
+        Debug.Log($"Added {item.itemName} to inventory.");
+    }
+
+    public void EquipItem(Item item)
+    {
+        switch (item.itemType)
+        {
+            case "Necklace":
+                equippedNecklace = item;
+                break;
+            case "Ring":
+                equippedRing = item;
+                break;
+            case "Amulet":
+                equippedAmulet = item;
+                break;
+            default:
+                Debug.LogWarning("Invalid item type for equipping.");
+                return;
+        }
+
+        UpdatePlayerStats();
+        Debug.Log($"Equipped {item.itemName}.");
+    }
+
+    public void UnequipItem(string slot)
+    {
+        switch (slot)
+        {
+            case "Necklace":
+                equippedNecklace = null;
+                break;
+            case "Ring":
+                equippedRing = null;
+                break;
+            case "Amulet":
+                equippedAmulet = null;
+                break;
+            default:
+                Debug.LogWarning("Invalid slot for unequipping.");
+                return;
+        }
+
+        UpdatePlayerStats();
+        Debug.Log($"Unequipped item from {slot} slot.");
+    }
+
+    public void UpdatePlayerStats()
+    {
+        // Update stats based on equipped items
+        PlayerCombat.UpdatePlayerStats();
     }
 }

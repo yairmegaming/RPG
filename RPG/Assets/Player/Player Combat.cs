@@ -1,104 +1,87 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerCombat : MonoBehaviour
 {
     [Header("Player Manager")]
-    public GameObject playerManagerObject;
+    [SerializeField] private GameObject playerManagerObject;
 
-    private PlayerManager playerManagerScript;
+    private PlayerManager PlayerManager => playerManagerObject.GetComponent<PlayerManager>();
 
-    private int playerCurrentDamage;   
-    private int playerCurrentHealth;
-    private int playerCurrentDefense;
+    private int currentDamage;
+    private int currentMaxHealth;
+    private int currentHealth;
+    private int currentDefense;
+    private int currentArmourPenetration;
 
-    void Awake()
-    {
-        playerManagerScript = playerManagerObject.GetComponent<PlayerManager>();
-    }
-    void Start()
-    {
-        playerCurrentDamage = playerManagerScript.GetPlayerDamage();
-        playerCurrentHealth = playerManagerScript.GetPlayerHealth();
-        playerCurrentDefense = playerManagerScript.GetPlayerDefense();
-        
-        playerManagerScript.playerChoiceEnum = PlayerChoiceEnum.none;
-    }
+    private const float DefaultHealEffectiveness = 100f;
+    private const float DefenseEffectiveness = 2f;
+    private const int CriticalHealthPercentage = 10;
 
-    // Used to get the current player stats while in combat
-    public int GetCurrentPlayerDamage()
+    private void Start()
     {
-        return playerCurrentDamage;
-    }
-    public int GetCurrentPlayerDefense()
-    {
-        return playerCurrentDefense;
-    }
-    public int GetCurrentPlayerHealth()
-    {
-        return playerCurrentHealth;
-    }
-    public int GetCurrentPlayerArmourPenetration()
-    {
-        return playerManagerScript.playerArmourPenetration;
+        UpdatePlayerStats();
+        PlayerManager.PlayerChoice = PlayerChoiceEnum.none;
     }
 
-    public void RockChoice()
+    public void UpdatePlayerStats()
     {
-        // Rock choice logic here
-        playerManagerScript.playerChoiceEnum = PlayerChoiceEnum.Rock;
-        Debug.Log("Player chose Rock");
-    }
-    public void PaperChoice()
-    {
-        // Paper choice logic here
-        playerManagerScript.playerChoiceEnum = PlayerChoiceEnum.Paper;
-        Debug.Log("Player chose Paper");
-    }
-    public void ScissorsChoice()
-    {
-        // Scissors choice logic here
-        playerManagerScript.playerChoiceEnum = PlayerChoiceEnum.Scissors;
-        Debug.Log("Player chose Scissors");
-    }
-    public void ResetChoices()
-    {
-        // Reset player choice logic here
-        playerManagerScript.playerChoiceEnum = PlayerChoiceEnum.none;
-        Debug.Log("Player choice reset");
+        currentDamage = PlayerManager.ModifiedDamage;
+        currentMaxHealth = PlayerManager.ModifiedMaxHealth;
+        currentDefense = PlayerManager.ModifiedDefense;
+        currentArmourPenetration = PlayerManager.ModifiedArmourPenetration;
+        currentHealth = currentMaxHealth;
     }
 
-    public void TakeDamage(int _damage)
+    public int CurrentHealth
     {
-        if (_damage > playerCurrentHealth)
+        get => currentHealth;
+        set => currentHealth = Mathf.Clamp(value, 0, currentMaxHealth);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth = damage >= currentHealth
+            ? Mathf.CeilToInt(currentMaxHealth * CriticalHealthPercentage / 100f)
+            : currentHealth - damage;
+
+        Debug.Log($"Player took {damage} damage. Current health: {currentHealth}");
+    }
+
+    public void Heal(int healAmount, float healEffectiveness = DefaultHealEffectiveness)
+    {
+        if (currentHealth < currentMaxHealth)
         {
-            // If damage is greater than current health, set health to 0
-            playerCurrentHealth = 0;
-            Debug.Log("Enemy took " + _damage + " damage. Current health: " + playerCurrentHealth);
+            currentHealth += Mathf.CeilToInt(healAmount * healEffectiveness / 100f);
+            currentHealth = Mathf.Min(currentHealth, currentMaxHealth);
+            Debug.Log($"Player healed {healAmount} health. Current health: {currentHealth}");
         }
         else
         {
-            // If damage is less than or equal to current health, subtract damage from health
-            playerCurrentHealth -= _damage;
-            Debug.Log("Enemy took " + _damage + " damage. Current health: " + playerCurrentHealth);
+            Debug.Log("Player is already at max health.");
         }
     }
-    public void Heal(int healAmount)
+
+    public void OnDefense(int enemyDamage, float defenseEffectiveness = DefenseEffectiveness)
     {
-        playerCurrentHealth += healAmount;
-        Debug.Log("Enemy healed " + healAmount + " health. Current health: " + playerCurrentHealth);
-    }
-    public void onDefense(int _damage)
-    {
-        // Reduce damage taken by the player
-        _damage -= Mathf.CeilToInt(playerCurrentDefense / 2f); // Reduce damage by half of the player's defense
-        if (_damage <= 0)
+        if (enemyDamage > currentDefense)
         {
-            _damage = 1; // Ensure at least 1 damage is taken
+            int damageTaken = Mathf.CeilToInt((enemyDamage - currentDefense) / defenseEffectiveness);
+            TakeDamage(damageTaken);
         }
-        TakeDamage(_damage);
-        Debug.Log("Enemy defended " + playerCurrentDefense + " damage.)"); 
+        else
+        {
+            Debug.Log("Player defended against the attack. No damage taken.");
+        }
+    }
+
+    public void RockChoice() => SetPlayerChoice(PlayerChoiceEnum.Rock, "Rock");
+    public void PaperChoice() => SetPlayerChoice(PlayerChoiceEnum.Paper, "Paper");
+    public void ScissorsChoice() => SetPlayerChoice(PlayerChoiceEnum.Scissors, "Scissors");
+    public void ResetChoices() => SetPlayerChoice(PlayerChoiceEnum.none, "reset");
+
+    private void SetPlayerChoice(PlayerChoiceEnum choice, string choiceName)
+    {
+        PlayerManager.PlayerChoice = choice;
+        Debug.Log($"Player chose {choiceName}");
     }
 }

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class EnemyDefault : MonoBehaviour
@@ -19,102 +17,58 @@ public abstract class EnemyDefault : MonoBehaviour
     [Header("Enemy Score")]
     public int EnemyScoreWorth = 0;
 
-    // Animation Variables
     [Header("Enemy Animation")]
     public Animator enemyAnimator;
     public RuntimeAnimatorController enemyAnimatorController;
-    
-    public int EnemyCurrentDamage
-    {
-        get { return EnemyCurrentDamage; }
-        set { EnemyCurrentDamage = value; }
-    }
-    public int EnemyCurrentDefense
-    {
-        get { return EnemyCurrentDefense; }
-        set { EnemyCurrentDefense = value; }
-    }
-    
-    public int EnemyCurrentHealth
-    {
-        get { return EnemyCurrentHealth; }
-        set { EnemyCurrentHealth = value; }
-    }
-    public int EnemyCurrentScoreWorth
-    {
-        get { return EnemyCurrentScoreWorth; }
-        set { EnemyCurrentScoreWorth = value; }
-    }
 
-    void Awake()
+    public int EnemyCurrentDamage { get; set; }
+    public int EnemyCurrentDefense { get; set; }
+    public int EnemyCurrentHealth { get; set; }
+    public int EnemyCurrentScoreWorth { get; set; }
+
+    private void Awake()
     {
         enemyManagerScript = EnemyManager.GetComponent<EnemyManager>();
     }
 
-    void Start()
+    private void Start()
     {
-        // Set the enemy choice to none at the start
-        enemyManagerScript.EnemyChoice = EnemyChoiceEnum.none;
+        InitializeEnemy();
+    }
 
-        // Set the enemy state to choosing
+    private void InitializeEnemy()
+    {
+        enemyManagerScript.EnemyChoice = EnemyChoiceEnum.none;
         EnemyCurrentHealth = EnemyHealth;
         EnemyCurrentDamage = EnemyDamage;
         EnemyCurrentDefense = EnemyDefense;
         EnemyCurrentScoreWorth = EnemyScoreWorth;
-
-        // Set the enemy animator controller
         enemyAnimator.runtimeAnimatorController = enemyAnimatorController;
     }
 
-    // Enemy Attack Method
-    // This method is used to deal damage to the player. It takes the player's current health and subtracts the enemy's current damage from it.
-    // It also checks if the player is defending and reduces the damage accordingly.
-    public void TakeDamage(int _damage)
+    public void TakeDamage(int damage)
     {
-        EnemyCurrentHealth -= _damage;
-        Debug.Log("Enemy took " + _damage + " damage. Current health: " + EnemyCurrentHealth);
-    }
-    // Enemy Heal Method
-    // This method is used to heal the enemy. It adds the heal amount to the current health.
-    // If the current health exceeds the max health, it sets the current health to the max health.
-    public void Heal(int _healAmount)
-    {
-        EnemyCurrentHealth += _healAmount;
-        Debug.Log("Enemy healed " + _healAmount + " health. Current health: " + EnemyCurrentHealth);
+        EnemyCurrentHealth -= damage;
+        Debug.Log($"Enemy took {damage} damage. Current health: {EnemyCurrentHealth}");
     }
 
-    // Enemy Defense Method
-    // This method is used to reduce the damage taken by the enemy. It subtracts the enemy's current defense from the incoming damage.
-    // If the damage is less than or equal to the defense, it sets the damage to 1.S
-    public void onDefense(int _damage, int _armourPenetration = 0)
+    public void Heal(int healAmount)
     {
-        _damage -= EnemyCurrentDefense - _armourPenetration;
-        if (_damage <= 0)
-        {
-            _damage = 1;
-        }
-        TakeDamage(_damage);
-        Debug.Log("Enemy defended " + EnemyCurrentDefense + " damage.)"); 
+        EnemyCurrentHealth = Mathf.Min(EnemyCurrentHealth + healAmount, EnemyHealth);
+        Debug.Log($"Enemy healed {healAmount} health. Current health: {EnemyCurrentHealth}");
     }
 
-    // Enemy State Methods
+    public void OnDefense(int damage, int armourPenetration = 0)
+    {
+        int effectiveDamage = Mathf.Max(1, damage - (EnemyCurrentDefense - armourPenetration));
+        TakeDamage(effectiveDamage);
+        Debug.Log($"Enemy defended with {EnemyCurrentDefense} defense. Damage taken: {effectiveDamage}");
+    }
+
     public abstract void EnemyChoosing();
 
-    // Enemy Animation Methods
-    public void EnemyAttackAnimation()
-    {
-        enemyAnimator.SetTrigger("Attack");
-    }
-    public void EnemyDefendAnimation()
-    {
-        enemyAnimator.SetTrigger("Defend");
-    }
-    public void EnemyDamagedAnimation()
-    {
-        enemyAnimator.SetTrigger("Damaged");
-    }
-    public void EnemyDeathAnimation()
-    {
-        enemyAnimator.SetTrigger("Died");
-    }
+    public void EnemyAttackAnimation() => enemyAnimator.SetTrigger("Attack");
+    public void EnemyDefendAnimation() => enemyAnimator.SetTrigger("Defend");
+    public void EnemyDamagedAnimation() => enemyAnimator.SetTrigger("Damaged");
+    public void EnemyDeathAnimation() => enemyAnimator.SetTrigger("Died");
 }
