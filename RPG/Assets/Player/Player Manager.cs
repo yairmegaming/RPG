@@ -25,7 +25,7 @@ public class PlayerManager : MonoBehaviour
     private Ring equippedRing;
     private Amulet equippedAmulet;
 
-    public PlayerEnum playerEnum;
+    public PlayerStates playerEnum;
     public PlayerChoiceEnum playerChoiceEnum;
 
     private PlayerCombat playerCombatScript;

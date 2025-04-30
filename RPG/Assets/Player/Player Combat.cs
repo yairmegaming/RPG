@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -69,46 +70,35 @@ public class PlayerCombat : MonoBehaviour
         Debug.Log("Player choice reset");
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int _damage)
     {
-        playerCurrentHealth -= damage;
-        Debug.Log("Enemy took " + damage + " damage. Current health: " + playerCurrentHealth);
+        if (_damage > playerCurrentHealth)
+        {
+            // If damage is greater than current health, set health to 0
+            playerCurrentHealth = 0;
+            Debug.Log("Enemy took " + _damage + " damage. Current health: " + playerCurrentHealth);
+        }
+        else
+        {
+            // If damage is less than or equal to current health, subtract damage from health
+            playerCurrentHealth -= _damage;
+            Debug.Log("Enemy took " + _damage + " damage. Current health: " + playerCurrentHealth);
+        }
     }
     public void Heal(int healAmount)
     {
         playerCurrentHealth += healAmount;
         Debug.Log("Enemy healed " + healAmount + " health. Current health: " + playerCurrentHealth);
     }
-    public void onDefense(int _damage, int _armourPenetration = 0)
+    public void onDefense(int _damage)
     {
         // Reduce damage taken by the player
-        _damage -= playerCurrentDefense - _armourPenetration;
+        _damage -= Mathf.CeilToInt(playerCurrentDefense / 2f); // Reduce damage by half of the player's defense
         if (_damage <= 0)
         {
             _damage = 1; // Ensure at least 1 damage is taken
         }
         TakeDamage(_damage);
         Debug.Log("Enemy defended " + playerCurrentDefense + " damage.)"); 
-    }
-
-    public void BuffDamage(int _buffPercentageAmount)
-    {
-        playerCurrentDamage += (int)(playerCurrentDamage * _buffPercentageAmount / 100f);
-        Debug.Log("Player buffed damage by " + _buffPercentageAmount + "%. Current damage: " + playerCurrentDamage);
-    }
-    public void BuffDefense(int _buffPercentageAmount)
-    {
-        playerCurrentDefense += (int)(playerCurrentDefense * _buffPercentageAmount / 100f);
-        Debug.Log("Player buffed defense by " + _buffPercentageAmount + "%. Current defense: " + playerCurrentDefense);
-    }
-    public void DebuffDamage(int _debuffPercentageAmount)
-    {
-        playerCurrentDamage -= (int)(playerCurrentDamage * _debuffPercentageAmount / 100f);
-        Debug.Log("Player debuffed damage by " + _debuffPercentageAmount + "%. Current damage: " + playerCurrentDamage);
-    }
-    public void DebuffDefense(int _debuffPercentageAmount)
-    {
-        playerCurrentDefense -= (int)(playerCurrentDefense * _debuffPercentageAmount / 100f);
-        Debug.Log("Player debuffed defense by " + _debuffPercentageAmount + "%. Current defense: " + playerCurrentDefense);
     }
 }

@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum EnemyEnum 
+public enum EnemyState 
 {
-    EnemyChoice,
+    none,
+    EnemyChoosing,
     EnemyAttack,
     EnemyDefend,
     EnemyDamaged,

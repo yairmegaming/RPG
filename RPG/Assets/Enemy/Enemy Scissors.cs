@@ -5,26 +5,26 @@ using UnityEngine;
 public class EnemyScissors : EnemyDefault
 {
 
-    public override void EnemyAttack()
+    public override void EnemyChoosing()
     {
         // Paper attack logic here
         var enemyChoice = Random.Range(1, 6); // Randomly choose between 1 and 3 for Rock, Paper, Scissors
         switch (enemyChoice)
         {
             case 1:
-                enemyChoiceEnum = EnemyChoiceEnum.Rock;
+                enemyManagerScript.EnemyChoice = EnemyChoiceEnum.Rock;
                 break;
             case 2:
-                enemyChoiceEnum = EnemyChoiceEnum.Paper;
+                enemyManagerScript.EnemyChoice = EnemyChoiceEnum.Paper;
                 break;
             case 3:
-                enemyChoiceEnum = EnemyChoiceEnum.Scissors;
+                enemyManagerScript.EnemyChoice = EnemyChoiceEnum.Scissors;
                 break;
             case 4:
-                enemyChoiceEnum = EnemyChoiceEnum.Scissors;
+                enemyManagerScript.EnemyChoice = EnemyChoiceEnum.Scissors;
                 break;
             case 5:
-                enemyChoiceEnum = EnemyChoiceEnum.Scissors;
+                enemyManagerScript.EnemyChoice = EnemyChoiceEnum.Scissors;
                 break;
         }
     }
