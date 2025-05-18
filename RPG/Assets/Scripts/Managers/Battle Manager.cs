@@ -13,10 +13,10 @@ public class BattleManager : MonoBehaviour
 
     private void Awake()
     {
-        if (playerManager == null)
-            playerManager = FindObjectOfType<PlayerManager>();
-        if (enemyManager == null)
-            enemyManager = FindObjectOfType<EnemyManager>();
+        if (playerManagerScript == null)
+            playerManagerScript = FindObjectOfType<PlayerManager>();
+        if (enemyManagerScript == null)
+            enemyManagerScript = FindObjectOfType<EnemyManager>();
         // Repeat for other managers as needed
     }
 
