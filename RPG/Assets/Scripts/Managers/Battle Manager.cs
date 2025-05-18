@@ -2,10 +2,6 @@ using UnityEngine;
 
 public class BattleManager : MonoBehaviour
 {
-    [Header("Battle Managers")]
-    public GameObject playerManagerObject;
-    public GameObject enemyManagerObject;
-
     [Header("Battle Units")]
     public GameObject player;
     public GameObject enemy;
@@ -15,11 +11,17 @@ public class BattleManager : MonoBehaviour
 
     private BattleEnum battleState;
 
+    private void Awake()
+    {
+        if (playerManager == null)
+            playerManager = FindObjectOfType<PlayerManager>();
+        if (enemyManager == null)
+            enemyManager = FindObjectOfType<EnemyManager>();
+        // Repeat for other managers as needed
+    }
+
     private void Start()
     {
-        playerManagerScript = playerManagerObject.GetComponent<PlayerManager>();
-        enemyManagerScript = enemyManagerObject.GetComponent<EnemyManager>();
-
         StartBattle();
     }
 

@@ -15,24 +15,20 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject eventUI;
 
     [Header("Battle UI")]
-
     [SerializeField] private GameObject attackButtons;
     [SerializeField] private GameObject enemySprite;
     [SerializeField] private GameObject enemyHealthBarText;
     [SerializeField] private GameObject playerHealthBarText;
     [SerializeField] private GameObject combatText;
 
+    private PlayerManager playerManager;
+    private EnemyManager enemyManager;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        // Automatically find the first PlayerManager and EnemyManager in the scene
+        playerManager = FindObjectOfType<PlayerManager>();
+        enemyManager = FindObjectOfType<EnemyManager>();
     }
 
     public void SetActiveUI(UIEnum uiEnum)
@@ -90,6 +86,28 @@ public class UIManager : MonoBehaviour
     private void SetAttackButtonsActive(bool isActive)
     {
         attackButtons.SetActive(isActive);
+    }
+
+    private void BuyItem(GameObject item)
+    {
+        if (item == null) 
+            {
+                Debug.Log("Item is Sold.");
+                return;
+            }
+        if (playerManager.inventory.Count >= playerManager.inventorySize)
+            {
+                Debug.Log("Inventory is full.");
+                return;
+            }
+        if (item.GetComponent<Item>().itemValue > playerManager.PlayerGold)
+            {
+                Debug.Log("Not enough Gold to buy this item.");
+                return;
+            }
+        playerManager.PlayerGold -= item.GetComponent<Item>().itemValue;
+        playerManager.inventory.Add(item.GetComponent<Item>());
+        item.SetActive(false);
     }
 
 }

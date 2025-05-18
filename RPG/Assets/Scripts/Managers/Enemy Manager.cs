@@ -4,17 +4,18 @@ public class EnemyManager : MonoBehaviour
 {
     [Header("Current Enemy")]
     public GameObject enemyPrefab;
-
     private EnemyState enemyState;
     private EnemyChoiceEnum enemyChoiceEnum;
     private EnemyDefault enemyDefault;
+
+    private PlayerManager playerManager;
+    private EnemyManager enemyManager;
 
     public EnemyState EnemyState
     {
         get => enemyState;
         set => enemyState = value;
     }
-
     public EnemyChoiceEnum EnemyChoice
     {
         get => enemyChoiceEnum;
@@ -43,6 +44,15 @@ public class EnemyManager : MonoBehaviour
     {
         get => enemyDefault.EnemyCurrentScoreWorth;
         set => enemyDefault.EnemyCurrentScoreWorth = value;
+    }
+
+    private void Awake()
+    {
+        if (playerManager == null)
+            playerManager = FindObjectOfType<PlayerManager>();
+        if (enemyManager == null)
+            enemyManager = FindObjectOfType<EnemyManager>();
+        // Repeat for other managers as needed
     }
 
     private void Start()

@@ -8,7 +8,7 @@ public class PlayerManager : MonoBehaviour
     public Item equippedRing;
     public Item equippedAmulet;
 
-    [Header("Player Visuals")]
+    [Header("Player")]
     [SerializeField] private GameObject player;
 
     [Header("Player Combat")]
@@ -60,7 +60,7 @@ public class PlayerManager : MonoBehaviour
         set => currentHealth = Mathf.Clamp(value, 0, ModifiedMaxHealth);
     }
 
-    public int PlayerScore
+    public int PlayerGold
     {
         get => playerScore;
         set => playerScore = value;
@@ -76,11 +76,6 @@ public class PlayerManager : MonoBehaviour
     {
         get => playerChoice;
         set => playerChoice = value;
-    }
-
-    private void Awake()
-    {
-        InitializePlayer();
     }
 
     private void InitializePlayer()
