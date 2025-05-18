@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4190130407697145041}
   - component: {fileID: 788183788460623531}
   - component: {fileID: 1666775101104848616}
+  - component: {fileID: 4284552027300328275}
   m_Layer: 5
   m_Name: Equiped (Ring)
   m_TagString: Untagged
@@ -101,6 +102,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &4284552027300328275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 241479542534261368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93ac807fe3db7c24383f055ab9a9cf45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemClass: 2
 --- !u!1 &1232450838743241794
 GameObject:
   m_ObjectHideFlags: 0

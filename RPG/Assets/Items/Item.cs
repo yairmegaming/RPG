@@ -2,21 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum SloTag
-{
-    None,
-    Necklace,
-    Ring,
-    Amulet,
-    Card,
-}
 
 [CreateAssetMenu(menuName = "Item")]  // This attribute allows you to create instances of this class in the Unity editor
 public class Item : ScriptableObject
 {
     
     [Header("Item Class")]
-    public SloTag itemClass;
+    public SlotTag itemClass;
 
     [Header("Item Image")]
     public Sprite itemImage;

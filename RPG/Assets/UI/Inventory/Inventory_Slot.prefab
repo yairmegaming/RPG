@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 4207836554423056505}
   - component: {fileID: 4190130407697145041}
   - component: {fileID: 6380458435524045407}
+  - component: {fileID: 3098545577414812794}
   m_Layer: 5
-  m_Name: Invetory_Slot
+  m_Name: Inventory_Slot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -100,3 +101,16 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 241479542534261368}
   m_CullTransparentMesh: 1
+--- !u!114 &3098545577414812794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 241479542534261368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93ac807fe3db7c24383f055ab9a9cf45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemClass: 0

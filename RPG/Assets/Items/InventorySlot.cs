@@ -8,14 +8,14 @@ using Unity.VisualScripting;
 public class InventorySlot : MonoBehaviour, IPointerClickHandler
 {
     public InventoryItem myItem { get; set; }
-    public SloTag itemClass;
+    public SlotTag itemClass;
 
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Left)
         {
             if (Inventory.Singleton.carriedItem == null) return;
-            if (itemClass != SloTag.None && Inventory.Singleton.carriedItem.myItem.itemClass != itemClass) return;
+            if (itemClass != SlotTag.None && Inventory.Singleton.carriedItem.myItem.itemClass != itemClass) return;
             SetItem(Inventory.Singleton.carriedItem);
         }
     }
@@ -29,7 +29,7 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler
         myItem.transform.SetParent(transform);
         myItem.canvasGroup.blocksRaycasts = true;
 
-        if (itemClass != SloTag.None)
+        if (itemClass != SlotTag.None)
         {
             Inventory.Singleton.EquipEquipment(itemClass, myItem);
         }

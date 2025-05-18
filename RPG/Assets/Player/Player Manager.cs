@@ -3,9 +3,6 @@ using System.Collections.Generic;
 
 public class PlayerManager : MonoBehaviour
 {
-     [Header("Inventory")]
-    public List<Item> inventory = new List<Item>();
-
     [Header("Equipped Items")]
     public Item equippedNecklace;
     public Item equippedRing;
@@ -24,29 +21,38 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private int playerScore = 0;
 
     [Header("Player Items")]
-    [SerializeField] private GameObject necklace;
-    [SerializeField] private GameObject ring;
-    [SerializeField] private GameObject amulet;
+    public List<Item> inventory = new List<Item>();
+    public int inventorySize = 20;
 
     [Header("Player Cards")]
     public List<Card> cardDeck = new List<Card>();
-
+    public int maxDeckSize = 10;
 
     private PlayerStates playerState;
     private PlayerChoiceEnum playerChoice;
-
     private int currentHealth;
 
     private PlayerCombat PlayerCombat => player.GetComponent<PlayerCombat>();
 
-    private Item EquippedNecklace => necklace.GetComponent<Item>();
-    private Item EquippedRing => ring.GetComponent<Item>();
-    private Item EquippedAmulet => amulet.GetComponent<Item>();
+    public int ModifiedDamage => baseDamage +
+        (equippedNecklace ? equippedNecklace.itemDamage : 0) +
+        (equippedRing ? equippedRing.itemDamage : 0) +
+        (equippedAmulet ? equippedAmulet.itemDamage : 0);
 
-    public int ModifiedDamage => baseDamage + EquippedNecklace.itemDamage + EquippedRing.itemDamage + EquippedAmulet.itemDamage;
-    public int ModifiedDefense => baseDefense + EquippedNecklace.itemDefense + EquippedRing.itemDefense + EquippedAmulet.itemDefense;
-    public int ModifiedMaxHealth => baseMaxHealth + EquippedNecklace.itemMaxHealth + EquippedRing.itemMaxHealth + EquippedAmulet.itemMaxHealth;
-    public int ModifiedArmourPenetration => baseArmourPenetration + EquippedNecklace.itemArmourPenetration + EquippedRing.itemArmourPenetration + EquippedAmulet.itemArmourPenetration;
+    public int ModifiedDefense => baseDefense +
+        (equippedNecklace ? equippedNecklace.itemDefense : 0) +
+        (equippedRing ? equippedRing.itemDefense : 0) +
+        (equippedAmulet ? equippedAmulet.itemDefense : 0);
+
+    public int ModifiedMaxHealth => baseMaxHealth +
+        (equippedNecklace ? equippedNecklace.itemMaxHealth : 0) +
+        (equippedRing ? equippedRing.itemMaxHealth : 0) +
+        (equippedAmulet ? equippedAmulet.itemMaxHealth : 0);
+
+    public int ModifiedArmourPenetration => baseArmourPenetration +
+        (equippedNecklace ? equippedNecklace.itemArmourPenetration : 0) +
+        (equippedRing ? equippedRing.itemArmourPenetration : 0) +
+        (equippedAmulet ? equippedAmulet.itemArmourPenetration : 0);
 
     public int CurrentHealth
     {
@@ -129,70 +135,107 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
+    // Inventory management
     public void AddItemToInventory(Item item)
     {
+        if (item == null || inventory.Count >= inventorySize)
+        {
+            Debug.LogWarning("Cannot add item to inventory.");
+            return;
+        }
         inventory.Add(item);
         Debug.Log($"Added {item.itemName} to inventory.");
     }
 
+    public void RemoveItemFromInventory(Item item)
+    {
+        if (item == null || !inventory.Contains(item))
+        {
+            Debug.LogWarning("Cannot remove item from inventory.");
+            return;
+        }
+        inventory.Remove(item);
+        Debug.Log($"Removed {item.itemName} from inventory.");
+    }
+
     public void EquipItem(Item item)
     {
-        switch (item.itemType)
+        if (item == null) return;
+        switch (item.itemClass)
         {
-            case "Necklace":
+            case SlotTag.Necklace:
                 equippedNecklace = item;
                 break;
-            case "Ring":
+            case SlotTag.Ring:
                 equippedRing = item;
                 break;
-            case "Amulet":
+            case SlotTag.Amulet:
                 equippedAmulet = item;
                 break;
             default:
                 Debug.LogWarning("Invalid item type for equipping.");
                 return;
         }
-
         UpdatePlayerStats();
         Debug.Log($"Equipped {item.itemName}.");
     }
 
-    public void UnequipItem(string slot)
+    public void UnequipItem(SlotTag slot)
     {
         switch (slot)
         {
-            case "Necklace":
+            case SlotTag.Necklace:
                 equippedNecklace = null;
                 break;
-            case "Ring":
+            case SlotTag.Ring:
                 equippedRing = null;
                 break;
-            case "Amulet":
+            case SlotTag.Amulet:
                 equippedAmulet = null;
                 break;
             default:
                 Debug.LogWarning("Invalid slot for unequipping.");
                 return;
         }
-
         UpdatePlayerStats();
         Debug.Log($"Unequipped item from {slot} slot.");
     }
 
     public void UpdatePlayerStats()
     {
-        // Update stats based on equipped items
         PlayerCombat.UpdatePlayerStats();
     }
 
+    // Card management
     public void AddCardToDeck(Card card)
     {
+        if (card == null || cardDeck.Count >= maxDeckSize)
+        {
+            Debug.LogWarning("Cannot add card to deck.");
+            return;
+        }
         cardDeck.Add(card);
         Debug.Log($"Added {card.cardName} to deck.");
     }
 
+    public void RemoveCardFromDeck(Card card)
+    {
+        if (card == null || !cardDeck.Contains(card))
+        {
+            Debug.LogWarning("Cannot remove card from deck.");
+            return;
+        }
+        cardDeck.Remove(card);
+        Debug.Log($"Removed {card.cardName} from deck.");
+    }
+
     public void UseCard(Card card)
     {
+        if (card == null || !cardDeck.Contains(card))
+        {
+            Debug.LogWarning("Cannot use card.");
+            return;
+        }
         // Example: apply card effect
         switch (card.cardType)
         {
@@ -209,7 +252,7 @@ public class PlayerManager : MonoBehaviour
                 // Apply debuff to enemy
                 break;
         }
-        cardDeck.Remove(card);
+        RemoveCardFromDeck(card);
         Debug.Log($"Used card: {card.cardName}");
     }
 }

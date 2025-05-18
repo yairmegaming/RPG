@@ -10,6 +10,9 @@ public class CardInventory : MonoBehaviour
     [SerializeField] private CardInventoryItem cardItemPrefab;
     [SerializeField] private Card[] cards;
 
+    [Header("Player Reference")]
+    [SerializeField] private PlayerManager playerManager;
+
     private void Awake()
     {
         if (Singleton != null && Singleton != this)
@@ -28,6 +31,7 @@ public class CardInventory : MonoBehaviour
             if (cardSlots[i].myCardItem == null)
             {
                 Instantiate(cardItemPrefab, cardSlots[i].transform).Initialize(_card, cardSlots[i]);
+                playerManager?.AddCardToDeck(_card);
                 break;
             }
         }
