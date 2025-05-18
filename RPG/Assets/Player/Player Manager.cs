@@ -28,6 +28,9 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private GameObject ring;
     [SerializeField] private GameObject amulet;
 
+    [Header("Player Cards")]
+    public List<Card> cardDeck = new List<Card>();
+
 
     private PlayerStates playerState;
     private PlayerChoiceEnum playerChoice;
@@ -180,5 +183,33 @@ public class PlayerManager : MonoBehaviour
     {
         // Update stats based on equipped items
         PlayerCombat.UpdatePlayerStats();
+    }
+
+    public void AddCardToDeck(Card card)
+    {
+        cardDeck.Add(card);
+        Debug.Log($"Added {card.cardName} to deck.");
+    }
+
+    public void UseCard(Card card)
+    {
+        // Example: apply card effect
+        switch (card.cardType)
+        {
+            case CardType.Attack:
+                // Deal damage to enemy
+                break;
+            case CardType.Heal:
+                Heal(card.cardPower);
+                break;
+            case CardType.Buff:
+                // Apply buff
+                break;
+            case CardType.Debuff:
+                // Apply debuff to enemy
+                break;
+        }
+        cardDeck.Remove(card);
+        Debug.Log($"Used card: {card.cardName}");
     }
 }

@@ -6,8 +6,8 @@ public enum UIEnum
 {
     MainMenu,
     Settings,
-    PauseMenu,
     GameOver,
+    WinCombatMenu,
     Inventory,
     BattleUI,
     MapUI,
