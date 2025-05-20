@@ -60,7 +60,23 @@ jobs:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
 
-    # Manual build for Unity C# projects
+    # Install Unity (replace version as needed)
+    - name: Setup Unity
+      uses: game-ci/unity-installer@v3
+      with:
+        unityVersion: 2021.3.0f1
+
+    # Generate .sln and .csproj files using Unity in batchmode
+    - name: Generate project files
+      run: |
+        /opt/unity/Editor/Unity \
+          -batchmode \
+          -nographics \
+          -quit \
+          -projectPath . \
+          -executeMethod UnityEditor.SyncVS.SyncSolution
+
+    # Now restore and build as before
     - if: matrix.language == 'csharp' && matrix.build-mode == 'manual'
       name: Build Unity C# project
       shell: bash
