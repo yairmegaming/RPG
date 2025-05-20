@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class BattleManager : MonoBehaviour
@@ -10,6 +11,11 @@ public class BattleManager : MonoBehaviour
     private EnemyManager enemyManagerScript;
 
     private BattleEnum battleState;
+
+    public BattleEnum BattleState
+    {
+        get => battleState; private set => battleState = value;
+    }
 
     private void Awake()
     {
@@ -27,39 +33,58 @@ public class BattleManager : MonoBehaviour
 
     private void Update()
     {
-        switch (battleState)
+        StartCoroutine(CombatTextUpdate());
+    }
+
+    private IEnumerator CombatTextUpdate()
+    {
+        switch (BattleState)
         {
             case BattleEnum.ChoosingAction:
                 // Wait for the player to make a choice
                 break;
-
             case BattleEnum.CombatEffects:
+                yield return new WaitForSeconds(1f);
                 ResolveCombat();
                 break;
 
             case BattleEnum.CombatResolution:
+                yield return new WaitForSeconds(1f);
                 CheckBattleOutcome();
                 break;
 
             case BattleEnum.CombatEnd:
+                yield return new WaitForSeconds(1f);
                 EndBattle();
                 break;
         }
     }
-
     private void StartBattle()
     {
-        battleState = BattleEnum.ChoosingAction;
+        BattleState = BattleEnum.ChoosingAction;
         Debug.Log("Battle started!");
+    }
+
+    public void PlayerRock()
+    {
+        PlayerAction(PlayerChoiceEnum.Rock);
+    }
+    public void PlayerPaper()
+    {
+        PlayerAction(PlayerChoiceEnum.Paper);
+    }
+    public void PlayerScissors()
+    {
+        PlayerAction(PlayerChoiceEnum.Scissors);
     }
 
     public void PlayerAction(PlayerChoiceEnum playerChoice)
     {
         playerManagerScript.MakeChoice(playerChoice);
         enemyManagerScript.EnemyState = EnemyState.EnemyChoosing;
-        enemyManagerScript.enemyPrefab.GetComponent<EnemyDefault>().EnemyChoosing();
+        enemyManagerScript.EnemyPrefab.GetComponent<EnemyDefault>().EnemyChoosing();
 
-        battleState = BattleEnum.CombatEffects;
+        BattleState = BattleEnum.CombatEffects;
     }
 
     private void ResolveCombat()
@@ -91,7 +116,7 @@ public class BattleManager : MonoBehaviour
             playerManagerScript.TakeDamage(enemyManagerScript.EnemyDamage);
         }
 
-        battleState = BattleEnum.CombatResolution;
+        BattleState = BattleEnum.CombatResolution;
     }
 
     private void CheckBattleOutcome()
@@ -99,16 +124,16 @@ public class BattleManager : MonoBehaviour
         if (playerManagerScript.CurrentHealth <= 0)
         {
             Debug.Log("Player has been defeated!");
-            battleState = BattleEnum.CombatEnd;
+            BattleState = BattleEnum.CombatEnd;
         }
         else if (enemyManagerScript.EnemyHealth <= 0)
         {
             Debug.Log("Enemy has been defeated!");
-            battleState = BattleEnum.CombatEnd;
+            BattleState = BattleEnum.CombatEnd;
         }
         else
         {
-            battleState = BattleEnum.ChoosingAction;
+            BattleState = BattleEnum.ChoosingAction;
         }
     }
 

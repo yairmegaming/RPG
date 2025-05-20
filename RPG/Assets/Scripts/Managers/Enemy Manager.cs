@@ -2,8 +2,7 @@ using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
 {
-    [Header("Current Enemy")]
-    public GameObject enemyPrefab;
+    private GameObject enemyPrefab;
     private EnemyState enemyState;
     private EnemyChoiceEnum enemyChoiceEnum;
     private EnemyDefault enemyDefault;
@@ -46,17 +45,29 @@ public class EnemyManager : MonoBehaviour
         set => enemyDefault.EnemyCurrentScoreWorth = value;
     }
 
+    public Sprite EnemySprite
+    {
+        get => enemyDefault.enemySprite;
+        set => enemyDefault.enemySprite = value;
+    }
+    public GameObject EnemyPrefab
+    {
+        get => enemyPrefab;
+        set => enemyPrefab = value;
+    }
+
     private void Awake()
     {
         if (playerManager == null)
             playerManager = FindObjectOfType<PlayerManager>();
         if (enemyManager == null)
             enemyManager = FindObjectOfType<EnemyManager>();
-        // Repeat for other managers as needed
     }
 
     private void Start()
     {
+        SpawnRandomEnemy();
+
         EnemyChoice = EnemyChoiceEnum.none;
         EnemyState = EnemyState.none;
     }
@@ -85,6 +96,36 @@ public class EnemyManager : MonoBehaviour
                 enemyDefault.EnemyDeathAnimation();
                 break;
         }
+    }
+
+    public void SpawnRandomEnemy()
+    {
+        // Destroy previous enemy if it exists
+        if (enemyPrefab != null)
+            Destroy(enemyPrefab);
+
+        // Get a random enemy prefab from the database
+        var allEnemies = GameDatabase.Instance.allEnemies;
+        if (allEnemies == null || allEnemies.Count == 0)
+        {
+            Debug.LogWarning("No enemies found in GameDatabase!");
+            return;
+        }
+
+        int randomIndex = Random.Range(0, allEnemies.Count);
+        GameObject enemyToSpawn = allEnemies[randomIndex];
+
+        // Instantiate the enemy prefab
+        enemyPrefab = Instantiate(enemyToSpawn, transform.position, Quaternion.identity, transform);
+
+        // Get the EnemyDefault component for stat access
+        enemyDefault = enemyPrefab.GetComponent<EnemyDefault>();
+
+        // Optionally, initialize or reset enemy stats here if needed
+        // e.g., enemyDefault.ResetStats();
+
+        // Set tag if needed for compatibility
+        enemyPrefab.tag = "Enemy";
     }
 }
 

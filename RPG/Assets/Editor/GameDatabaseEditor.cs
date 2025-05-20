@@ -11,7 +11,7 @@ public class GameDatabaseEditor : Editor
 
         GameDatabase db = (GameDatabase)target;
 
-        if (GUILayout.Button("Auto-Fill Items and Cards"))
+        if (GUILayout.Button("Auto-Fill Items, Cards, and Enemies"))
         {
             string[] itemGuids = AssetDatabase.FindAssets("t:Item", new[] { "Assets/Items/Prefabs/Items" });
             db.allItems = itemGuids
@@ -23,6 +23,12 @@ public class GameDatabaseEditor : Editor
             db.allCards = cardGuids
                 .Select(guid => AssetDatabase.LoadAssetAtPath<Card>(AssetDatabase.GUIDToAssetPath(guid)))
                 .Where(card => card != null)
+                .ToList();
+
+            string[] enemyGuids = AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/Enemies/Prefabs" });
+            db.allEnemies = enemyGuids
+                .Select(guid => AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(guid)))
+                .Where(enemy => enemy != null)
                 .ToList();
 
             EditorUtility.SetDirty(db);

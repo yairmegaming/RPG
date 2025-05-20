@@ -8,8 +8,12 @@ public class GameDatabase : ScriptableObject
     public List<Item> allItems = new List<Item>();
     public List<Card> allCards = new List<Card>();
 
+    [Header("All Enemy Prefabs")]
+    public List<GameObject> allEnemies = new List<GameObject>();
+
     private Dictionary<string, Item> itemDict;
     private Dictionary<string, Card> cardDict;
+    private Dictionary<string, GameObject> enemyDict;
 
     private static GameDatabase _instance;
     public static GameDatabase Instance
@@ -42,6 +46,13 @@ public class GameDatabase : ScriptableObject
             if (card != null && !string.IsNullOrEmpty(card.cardID))
                 cardDict[card.cardID] = card;
         }
+
+        enemyDict = new Dictionary<string, GameObject>(allEnemies.Count);
+        foreach (var enemy in allEnemies)
+        {
+            if (enemy != null)
+                enemyDict[enemy.name] = enemy;
+        }
     }
 
     public Item GetItemByID(string id)
@@ -58,5 +69,13 @@ public class GameDatabase : ScriptableObject
             BuildDictionaries();
         cardDict.TryGetValue(id, out var card);
         return card;
+    }
+
+    public GameObject GetEnemyByName(string name)
+    {
+        if (enemyDict == null || enemyDict.Count != allEnemies.Count)
+            BuildDictionaries();
+        enemyDict.TryGetValue(name, out var enemy);
+        return enemy;
     }
 }
