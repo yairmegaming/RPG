@@ -78,15 +78,21 @@ jobs:
 
     # Now restore and build as before
     - if: matrix.language == 'csharp' && matrix.build-mode == 'manual'
-      name: Build Unity C# project
+      name: Build Unity C# solution
       shell: bash
       run: |
-        echo "Restoring NuGet packages for Unity project..."
-        find . -name "*.sln" -exec dotnet restore {} \;
-        echo "Building all Unity C# projects..."
-        find . -name "*.csproj" -exec dotnet build {} --configuration Release --no-restore \;
+        echo "Restoring NuGet packages for Unity solution..."
+        dotnet restore YourProject.sln
+        echo "Building Unity C# solution..."
+        dotnet build YourProject.sln --configuration Release --no-restore
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
+    - name: List solution and project files
+      run: |
+        echo "Solution files:"
+        find . -name "*.sln"
+        echo "Project files:"
+        find . -name "*.csproj"
