@@ -84,7 +84,7 @@ jobs:
         echo "Restoring NuGet packages for Unity solution..."
         dotnet restore YourProject.sln
         echo "Building Unity C# solution..."
-        dotnet build YourProject.sln --configuration Release --no-restore
+        msbuild YourProject.sln /p:Configuration=Release
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
