@@ -82,9 +82,9 @@ jobs:
       shell: bash
       run: |
         echo "Restoring NuGet packages for Unity solution..."
-        dotnet restore YourProject.sln
+        dotnet restore RPG/RPG.sln
         echo "Building Unity C# solution..."
-        msbuild YourProject.sln /p:Configuration=Release
+        dotnet build RPG/RPG.sln --configuration Release --no-restore
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
