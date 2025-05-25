@@ -3,7 +3,27 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - CombatText
+  - PlayerHealthBarText
+  - EnemyHealthBarText
+  - EnemySprite
+  - ShopUI
+  - InventoryUI
+  - GameOverUI
+  - WinCombatUI
+  - SettingsUI
+  - MainMenuUI
+  - MapUI
+  - BattleUI
+  - EventUI
+  - ShopItem
+  - InventoryItem
+  - Player
+  - Enemy
+  - Untagged
+  - MenuButton
+  - AttackButton
   layers:
   - Default
   - TransparentFX

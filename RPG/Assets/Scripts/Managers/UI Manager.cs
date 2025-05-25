@@ -20,16 +20,16 @@ public class UIManager : MonoBehaviour
     [Header("UI Manager")]
     [SerializeField] private GameObject mainMenuUI;
     [SerializeField] private GameObject settingsUI;
-    [SerializeField] private GameObject winCombatUI;
+    [SerializeField] private GameObject winCombatMenuUI;
     [SerializeField] private GameObject gameOverUI;
     [SerializeField] private GameObject inventoryUI;
     [SerializeField] private GameObject battleUI;
     [SerializeField] private GameObject mapUI;
-    [SerializeField] private GameObject shopUI;
+    [SerializeField] private GameObject shopMenuUI;
     [SerializeField] private GameObject eventUI;
 
     [Header("Battle UI")]
-    [SerializeField] private GameObject[] attackButtons;
+    [SerializeField] private GameObject attackButtonsGroup; // <-- Use this instead of array
     [SerializeField] private GameObject[] menuButtons;
     [SerializeField] private GameObject enemySprite;
     [SerializeField] private GameObject enemyHealthBarText;
@@ -41,7 +41,6 @@ public class UIManager : MonoBehaviour
     private EnemyManager enemyManager;
 
     private Dictionary<UIEnum, GameObject> uiPanels;
-    private Dictionary<string, GameObject[]> uiGroups;
 
     private void Awake()
     {
@@ -49,58 +48,27 @@ public class UIManager : MonoBehaviour
         enemyManager = FindObjectOfType<EnemyManager>();
         battleManager = FindObjectOfType<BattleManager>();
 
-        // Example: Assign tags to attack buttons if not already set
-        var attackButtonsInScene = GameObject.FindGameObjectsWithTag("Untagged");
-        foreach (var go in attackButtonsInScene)
-        {
-            if (go.name.Contains("AttackButton")) // or any naming convention you use
-                go.tag = "AttackButton";
-        }
-
-        // Do the same for menu buttons if needed
-        var menuButtonsInScene = GameObject.FindGameObjectsWithTag("Untagged");
-        foreach (var go in menuButtonsInScene)
-        {
-            if (go.name.Contains("MenuButton"))
-                go.tag = "MenuButton";
-        }
-
-        // Initialize the UI panel dictionary
         uiPanels = new Dictionary<UIEnum, GameObject>
         {
-            { UIEnum.MainMenu, GameObject.Find("MainMenuUI") },
-            { UIEnum.Settings, GameObject.Find("SettingsUI") },
-            { UIEnum.WinCombat, GameObject.Find("WinCombatUI") },
-            { UIEnum.GameOver, GameObject.Find("GameOverUI") },
-            { UIEnum.Inventory, GameObject.Find("InventoryUI") },
-            { UIEnum.Battle, GameObject.Find("BattleUI") },
-            { UIEnum.Map, GameObject.Find("MapUI") },
-            { UIEnum.Shop, GameObject.Find("ShopUI") },
-            { UIEnum.Event, GameObject.Find("EventUI") }
+            { UIEnum.MainMenu, mainMenuUI },
+            { UIEnum.Settings, settingsUI },
+            { UIEnum.WinCombat, winCombatMenuUI },
+            { UIEnum.GameOver, gameOverUI },
+            { UIEnum.Inventory, inventoryUI },
+            { UIEnum.Battle, battleUI },
+            { UIEnum.Map, mapUI },
+            { UIEnum.Shop, shopMenuUI },
+            { UIEnum.Event, eventUI }
         };
-
-        // Example for button groups (using tags)
-        uiGroups = new Dictionary<string, GameObject[]>
-        {
-            { "AttackButtons", GameObject.FindGameObjectsWithTag("AttackButton") },
-            { "MenuButtons", GameObject.FindGameObjectsWithTag("MenuButton") }
-        };
-
-        if (!enemySprite) enemySprite = GameObject.Find("EnemySprite");
-        if (!enemyHealthBarText) enemyHealthBarText = GameObject.Find("EnemyHealthBarText");
-        if (!playerHealthBarText) playerHealthBarText = GameObject.Find("PlayerHealthBarText");
-        if (!combatText) combatText = GameObject.Find("CombatText");
     }
 
     private void Start()
     {
-        // Set the initial UI state
         SetActiveUI(UIEnum.MainMenu);
     }
 
     private void Update()
     {
-        // Update UI elements based on game state
         if (playerManager != null && enemyManager != null)
         {
             SetEnemyHealthBarText(enemyManager.EnemyHealth.ToString());
@@ -140,73 +108,8 @@ public class UIManager : MonoBehaviour
             }
         }
     }
+
     // --- UI BUTTON FUNCTIONS ---
-
-    public void OpenSettingsMenu()
-    {
-        SetActiveUI(UIEnum.Settings);
-    }
-
-    public void CloseSettingsMenu()
-    {
-        SetActiveUI(UIEnum.MainMenu);
-    }
-
-    public void OpenGameOverMenu()
-    {
-        SetActiveUI(UIEnum.GameOver);
-    }
-
-    public void OpenInventoryMenu()
-    {
-        SetActiveUI(UIEnum.Inventory);
-    }
-
-    public void OpenBattleMenu()
-    {
-        SetActiveUI(UIEnum.Battle);
-    }
-
-    public void OpenMapMenu()
-    {
-        SetActiveUI(UIEnum.Map);
-    }
-
-    public void OpenShopMenu()
-    {
-        SetActiveUI(UIEnum.Shop);
-    }
-
-    public void OpenEventMenu()
-    {
-        SetActiveUI(UIEnum.Event);
-    }
-
-    public void StartNewGame()
-    {
-        // Logic to start a new game, reset player state, etc.
-        playerManager.ResetPlayer();
-        enemyManager.ResetEnemy();
-        SetActiveUI(UIEnum.Battle);
-        Debug.Log("New Game Started!");
-    }
-
-    public void OpenCombatChoice()
-    {
-        // Logic to open combat choice UI, e.g., showing attack options
-        SetActiveUI(UIEnum.Battle);
-        SetAttackButtonsActive(true);
-        Debug.Log("Combat Choice Opened!");
-    }
-
-
-    public void QuitGame()
-    {
-        Application.Quit();
-        Debug.Log("Quit Game");
-    }
-
-    // --- END UI BUTTON FUNCTIONS ---
 
     public void SetActiveUI(UIEnum uiEnum)
     {
@@ -217,15 +120,13 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public GameObject[] GetUIGroup(string groupName)
+    public void QuitGame()
     {
-        return uiGroups.TryGetValue(groupName, out var group) ? group : null;
+        Application.Quit();
+        Debug.Log("Quit Game");
     }
 
-    public GameObject GetPanel(UIEnum uiEnum)
-    {
-        return uiPanels.TryGetValue(uiEnum, out var panel) ? panel : null;
-    }
+    // --- UI ELEMENT HELPERS ---
 
     private void SetEnemyHealthBarText(string text)
     {
@@ -245,37 +146,85 @@ public class UIManager : MonoBehaviour
     }
     private void SetAttackButtonsActive(bool isActive)
     {
-        foreach (var button in attackButtons)
-        {
-            button.SetActive(isActive);
-        }
+        if (attackButtonsGroup != null)
+            attackButtonsGroup.SetActive(isActive);
 
-        foreach (var button in menuButtons)
+        if (menuButtons != null)
         {
-            button.SetActive(!isActive);
+            foreach (var button in menuButtons)
+            {
+                if (button != null)
+                    button.SetActive(!isActive);
+            }
         }
     }
 
+    // --- SHOP/INVENTORY EXAMPLE ---
+
     private void BuyItem(GameObject item)
     {
-        if (item == null) 
-            {
-                Debug.Log("Item is Sold.");
-                return;
-            }
+        if (item == null)
+        {
+            Debug.Log("Item is Sold.");
+            return;
+        }
         if (playerManager.inventory.Count >= playerManager.inventorySize)
-            {
-                Debug.Log("Inventory is full.");
-                return;
-            }
+        {
+            Debug.Log("Inventory is full.");
+            return;
+        }
         if (item.GetComponent<Item>().itemValue > playerManager.PlayerGold)
-            {
-                Debug.Log("Not enough Gold to buy this item.");
-                return;
-            }
+        {
+            Debug.Log("Not enough Gold to buy this item.");
+            return;
+        }
         playerManager.PlayerGold -= item.GetComponent<Item>().itemValue;
         playerManager.inventory.Add(item.GetComponent<Item>());
         item.SetActive(false);
     }
 
+    // Call this to show the battle UI and hide menus/inventory
+    public void ShowBattleUI()
+    {
+        battleUI.SetActive(true);
+        settingsUI.SetActive(false);
+        inventoryUI.SetActive(false);
+        attackButtonsGroup.SetActive(false);
+    }
+
+    // Call this to open the settings (menu)
+    public void ShowSettingsMenu()
+    {
+        battleUI.SetActive(false);
+        settingsUI.SetActive(true);
+        inventoryUI.SetActive(false);
+        attackButtonsGroup.SetActive(false);
+    }
+
+    // Call this to open the card inventory
+    public void ShowCardInventory()
+    {
+        battleUI.SetActive(false);
+        settingsUI.SetActive(false);
+        inventoryUI.SetActive(true);
+        attackButtonsGroup.SetActive(false);
+    }
+
+    // Call this to show attack buttons (and hide others if needed)
+    public void ShowAttackButtons()
+    {
+        battleUI.SetActive(true);
+        settingsUI.SetActive(false);
+        inventoryUI.SetActive(false);
+        attackButtonsGroup.SetActive(true);
+    }
+
+    // Optional: Hide all overlays (for transitions, etc.)
+    public void HideAllMenus()
+    {
+        battleUI.SetActive(false);
+        settingsUI.SetActive(false);
+        inventoryUI.SetActive(false);
+        attackButtonsGroup.SetActive(false);
+    }
 }

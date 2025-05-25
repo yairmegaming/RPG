@@ -29,7 +29,12 @@ public class AutoConnectUIButtonEvents : EditorWindow
                 MethodInfo method = typeof(UIManager).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 if (method != null)
                 {
-                    UnityEditor.Events.UnityEventTools.RemovePersistentListeners(btn.onClick);
+                    // Remove all persistent listeners
+                    int count = btn.onClick.GetPersistentEventCount();
+                    for (int i = count - 1; i >= 0; i--)
+                    {
+                        UnityEditor.Events.UnityEventTools.RemovePersistentListener(btn.onClick, i);
+                    }
                     UnityEditor.Events.UnityEventTools.AddPersistentListener(btn.onClick, () => method.Invoke(uiManager, null));
                     Debug.Log($"Connected {btn.gameObject.name} to {methodName} in UIManager.");
                 }
