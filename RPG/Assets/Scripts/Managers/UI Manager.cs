@@ -2,6 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum UIEnum
+{
+    MainMenu,
+    Settings,
+    WinCombat,
+    GameOver,
+    Inventory,
+    Battle,
+    Map,
+    Shop,
+    Event,
+}
+
 public class UIManager : MonoBehaviour
 {
     [Header("UI Manager")]
@@ -27,11 +40,56 @@ public class UIManager : MonoBehaviour
     private BattleManager battleManager;
     private EnemyManager enemyManager;
 
+    private Dictionary<UIEnum, GameObject> uiPanels;
+    private Dictionary<string, GameObject[]> uiGroups;
+
     private void Awake()
     {
         playerManager = FindObjectOfType<PlayerManager>();
         enemyManager = FindObjectOfType<EnemyManager>();
         battleManager = FindObjectOfType<BattleManager>();
+
+        // Example: Assign tags to attack buttons if not already set
+        var attackButtonsInScene = GameObject.FindGameObjectsWithTag("Untagged");
+        foreach (var go in attackButtonsInScene)
+        {
+            if (go.name.Contains("AttackButton")) // or any naming convention you use
+                go.tag = "AttackButton";
+        }
+
+        // Do the same for menu buttons if needed
+        var menuButtonsInScene = GameObject.FindGameObjectsWithTag("Untagged");
+        foreach (var go in menuButtonsInScene)
+        {
+            if (go.name.Contains("MenuButton"))
+                go.tag = "MenuButton";
+        }
+
+        // Initialize the UI panel dictionary
+        uiPanels = new Dictionary<UIEnum, GameObject>
+        {
+            { UIEnum.MainMenu, GameObject.Find("MainMenuUI") },
+            { UIEnum.Settings, GameObject.Find("SettingsUI") },
+            { UIEnum.WinCombat, GameObject.Find("WinCombatUI") },
+            { UIEnum.GameOver, GameObject.Find("GameOverUI") },
+            { UIEnum.Inventory, GameObject.Find("InventoryUI") },
+            { UIEnum.Battle, GameObject.Find("BattleUI") },
+            { UIEnum.Map, GameObject.Find("MapUI") },
+            { UIEnum.Shop, GameObject.Find("ShopUI") },
+            { UIEnum.Event, GameObject.Find("EventUI") }
+        };
+
+        // Example for button groups (using tags)
+        uiGroups = new Dictionary<string, GameObject[]>
+        {
+            { "AttackButtons", GameObject.FindGameObjectsWithTag("AttackButton") },
+            { "MenuButtons", GameObject.FindGameObjectsWithTag("MenuButton") }
+        };
+
+        if (!enemySprite) enemySprite = GameObject.Find("EnemySprite");
+        if (!enemyHealthBarText) enemyHealthBarText = GameObject.Find("EnemyHealthBarText");
+        if (!playerHealthBarText) playerHealthBarText = GameObject.Find("PlayerHealthBarText");
+        if (!combatText) combatText = GameObject.Find("CombatText");
     }
 
     private void Start()
@@ -106,32 +164,41 @@ public class UIManager : MonoBehaviour
 
     public void OpenBattleMenu()
     {
-        SetActiveUI(UIEnum.BattleUI);
+        SetActiveUI(UIEnum.Battle);
     }
 
     public void OpenMapMenu()
     {
-        SetActiveUI(UIEnum.MapUI);
+        SetActiveUI(UIEnum.Map);
     }
 
     public void OpenShopMenu()
     {
-        SetActiveUI(UIEnum.ShopUI);
+        SetActiveUI(UIEnum.Shop);
     }
 
     public void OpenEventMenu()
     {
-        SetActiveUI(UIEnum.EventUI);
+        SetActiveUI(UIEnum.Event);
     }
 
-    public void GoToNextFight()
+    public void StartNewGame()
     {
-        SetActiveUI(UIEnum.BattleUI);
-        enemyManager.SpawnRandomEnemy();
-        playerManager.PlayerState = PlayerStates.PlayerChoosing;
-        // Optionally reset player/enemy health, update UI, etc.
-        Debug.Log("Next fight started!");
+        // Logic to start a new game, reset player state, etc.
+        playerManager.ResetPlayer();
+        enemyManager.ResetEnemy();
+        SetActiveUI(UIEnum.Battle);
+        Debug.Log("New Game Started!");
     }
+
+    public void OpenCombatChoice()
+    {
+        // Logic to open combat choice UI, e.g., showing attack options
+        SetActiveUI(UIEnum.Battle);
+        SetAttackButtonsActive(true);
+        Debug.Log("Combat Choice Opened!");
+    }
+
 
     public void QuitGame()
     {
@@ -143,48 +210,21 @@ public class UIManager : MonoBehaviour
 
     public void SetActiveUI(UIEnum uiEnum)
     {
-        // Logic to set the active UI based on the enum value
-        // This could involve enabling/disabling GameObjects, changing scenes, etc.
-        switch (uiEnum)
+        foreach (var panel in uiPanels)
         {
-            case UIEnum.MainMenu:
-                // Activate Main Menu UI
-                mainMenuUI.SetActive(true);
-                settingsUI.SetActive(false);
-                break;
-            case UIEnum.Settings:
-                // Activate Settings UI
-                mainMenuUI.SetActive(false);
-                settingsUI.SetActive(true);
-                break;
-            case UIEnum.GameOver:
-                // Activate Game Over UI
-                battleUI.SetActive(false);
-                gameOverUI.SetActive(true);
-                break;
-            case UIEnum.WinCombatMenu:
-                // Activate Win Combat Menu UI
-                battleUI.SetActive(false);
-                winCombatUI.SetActive(true);
-                break;
-            case UIEnum.Inventory:
-                // Activate Inventory UI
-                break;
-            case UIEnum.BattleUI:
-                // Activate Battle UI
-                break;
-            case UIEnum.MapUI:
-                // Activate Map UI
-                break;
-            case UIEnum.ShopUI:
-                // Activate Shop UI
-                break;
-            case UIEnum.EventUI:
-                // Activate Event UI
-                battleUI.SetActive(false);
-                eventUI.SetActive(true);
-                break;
+            if (panel.Value != null)
+                panel.Value.SetActive(panel.Key == uiEnum);
         }
+    }
+
+    public GameObject[] GetUIGroup(string groupName)
+    {
+        return uiGroups.TryGetValue(groupName, out var group) ? group : null;
+    }
+
+    public GameObject GetPanel(UIEnum uiEnum)
+    {
+        return uiPanels.TryGetValue(uiEnum, out var panel) ? panel : null;
     }
 
     private void SetEnemyHealthBarText(string text)

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -249,5 +250,14 @@ public class PlayerManager : MonoBehaviour
         }
         RemoveCardFromDeck(card);
         Debug.Log($"Used card: {card.cardName}");
+    }
+
+    public void ResetPlayer()
+    {
+        CurrentHealth = ModifiedMaxHealth;
+        PlayerGold = 0;
+        inventory.Clear();
+        cardDeck.Clear();
+        Debug.Log("Player reset.");
     }
 }

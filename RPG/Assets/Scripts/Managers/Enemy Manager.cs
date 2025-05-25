@@ -127,5 +127,15 @@ public class EnemyManager : MonoBehaviour
         // Set tag if needed for compatibility
         enemyPrefab.tag = "Enemy";
     }
+
+    public void ResetEnemy()
+    {
+        if (enemyPrefab != null)
+        {
+            Destroy(enemyPrefab);
+            enemyPrefab = null;
+        }
+        SpawnRandomEnemy();
+    }
 }
 
