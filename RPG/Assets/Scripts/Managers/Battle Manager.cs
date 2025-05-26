@@ -9,6 +9,7 @@ public class BattleManager : MonoBehaviour
 
     private PlayerManager playerManagerScript;
     private EnemyManager enemyManagerScript;
+    private UIManager uiManager;
 
     private BattleEnum battleState;
 
@@ -23,7 +24,8 @@ public class BattleManager : MonoBehaviour
             playerManagerScript = FindObjectOfType<PlayerManager>();
         if (enemyManagerScript == null)
             enemyManagerScript = FindObjectOfType<EnemyManager>();
-        // Repeat for other managers as needed
+        if (uiManager == null)
+            uiManager = FindObjectOfType<UIManager>();
     }
 
     private void Start()
@@ -139,7 +141,18 @@ public class BattleManager : MonoBehaviour
 
     private void EndBattle()
     {
-        Debug.Log("Battle ended!");
-        // Handle post-battle logic (e.g., rewards, returning to the overworld)
+        if (playerManagerScript.CurrentHealth > 0 && enemyManagerScript.EnemyHealth <= 0)
+        {
+            playerManagerScript.RegisterBattleWin();
+            int rewardGold = enemyManagerScript.EnemyScoreWorth;
+            playerManagerScript.AddGold(rewardGold);
+            uiManager.SetWinCombatMenuActive();
+            uiManager.UpdateStatsUI();
+        }
+        else if (playerManagerScript.CurrentHealth <= 0)
+        {
+            uiManager.SetLoseCombatMenuActive();
+            uiManager.UpdateStatsUI();
+        }
     }
 }

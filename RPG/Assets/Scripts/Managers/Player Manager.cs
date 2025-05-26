@@ -18,8 +18,8 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private int baseDefense = 0;
     [SerializeField] private int baseMaxHealth = 3;
 
-    [Header("Player Score")]
-    [SerializeField] private int playerScore = 0;
+    [Header("Player Gold")]
+    [SerializeField] private int playerGold = 0;
 
     [Header("Player Items")]
     public List<Item> inventory = new List<Item>();
@@ -28,6 +28,10 @@ public class PlayerManager : MonoBehaviour
     [Header("Player Cards")]
     public List<Card> cardDeck = new List<Card>();
     public int maxDeckSize = 10;
+
+    [Header("Player Stats Tracking")]
+    public int totalGoldEarned = 0;
+    public int totalBattlesWon = 0;
 
     private PlayerStates playerState;
     private PlayerChoiceEnum playerChoice;
@@ -63,8 +67,8 @@ public class PlayerManager : MonoBehaviour
 
     public int PlayerGold
     {
-        get => playerScore;
-        set => playerScore = value;
+        get => playerGold;
+        set => playerGold = value;
     }
 
     public PlayerStates PlayerState
@@ -252,12 +256,37 @@ public class PlayerManager : MonoBehaviour
         Debug.Log($"Used card: {card.cardName}");
     }
 
+    // Call this whenever the player receives gold (from any source)
+    public void AddGold(int amount)
+    {
+        PlayerGold += amount;
+        totalGoldEarned += amount;
+        Debug.Log($"Player received {amount} gold. Total gold earned: {totalGoldEarned}");
+    }
+
+    // Call this whenever the player wins a battle
+    public void RegisterBattleWin()
+    {
+        totalBattlesWon++;
+        Debug.Log($"Player has won {totalBattlesWon} battles.");
+    }
+
+    // Call this at the start of a new battle to ensure tracking is correct
+    public void StartNewBattle()
+    {
+        // Any per-battle resets can go here if needed
+        Debug.Log("New battle started. Tracking continues.");
+    }
+
+    // Call this when the reset button is pressed to reset all stats and progress
     public void ResetPlayer()
     {
         CurrentHealth = ModifiedMaxHealth;
         PlayerGold = 0;
         inventory.Clear();
         cardDeck.Clear();
-        Debug.Log("Player reset.");
+        totalGoldEarned = 0;
+        totalBattlesWon = 0;
+        Debug.Log("Player reset. All stats and progress cleared.");
     }
 }

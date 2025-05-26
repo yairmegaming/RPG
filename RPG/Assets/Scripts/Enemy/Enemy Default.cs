@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class EnemyDefault : MonoBehaviour
+public class EnemyDefault : MonoBehaviour
 {
     [Header("Enemy Visuals")]
     public Sprite enemySprite;
@@ -20,6 +20,11 @@ public abstract class EnemyDefault : MonoBehaviour
     [Header("Enemy Animation")]
     public Animator enemyAnimator;
     public RuntimeAnimatorController enemyAnimatorController;
+
+    [Header("Enemy Choice Chances (Sum should be > 0)")]
+    [Range(0, 100)] public int rockChance = 33;
+    [Range(0, 100)] public int paperChance = 33;
+    [Range(0, 100)] public int scissorsChance = 34;
 
     public int EnemyCurrentDamage { get; set; }
     public int EnemyCurrentDefense { get; set; }
@@ -43,7 +48,8 @@ public abstract class EnemyDefault : MonoBehaviour
         EnemyCurrentDamage = EnemyDamage;
         EnemyCurrentDefense = EnemyDefense;
         EnemyCurrentScoreWorth = EnemyScoreWorth;
-        enemyAnimator.runtimeAnimatorController = enemyAnimatorController;
+        if (enemyAnimator != null && enemyAnimatorController != null)
+            enemyAnimator.runtimeAnimatorController = enemyAnimatorController;
     }
 
     public void TakeDamage(int damage)
@@ -65,7 +71,31 @@ public abstract class EnemyDefault : MonoBehaviour
         Debug.Log($"Enemy defended with {EnemyCurrentDefense} defense. Damage taken: {effectiveDamage}");
     }
 
-    public abstract void EnemyChoosing();
+    // Set the chance for each choice in the Inspector (rockChance, paperChance, scissorsChance)
+    public virtual void EnemyChoosing()
+    {
+        int total = rockChance + paperChance + scissorsChance;
+        if (total <= 0)
+        {
+            Debug.LogWarning("Enemy choice chances are all zero! Defaulting to Rock.");
+            enemyManagerScript.EnemyChoice = EnemyChoiceEnum.Rock;
+            return;
+        }
+
+        int roll = Random.Range(1, total + 1);
+        if (roll <= rockChance)
+        {
+            enemyManagerScript.EnemyChoice = EnemyChoiceEnum.Rock;
+        }
+        else if (roll <= rockChance + paperChance)
+        {
+            enemyManagerScript.EnemyChoice = EnemyChoiceEnum.Paper;
+        }
+        else
+        {
+            enemyManagerScript.EnemyChoice = EnemyChoiceEnum.Scissors;
+        }
+    }
 
     public void EnemyAttackAnimation() => enemyAnimator.SetTrigger("Attack");
     public void EnemyDefendAnimation() => enemyAnimator.SetTrigger("Defend");

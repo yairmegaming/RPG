@@ -2,39 +2,50 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum UIEnum
-{
-    MainMenu,
-    Settings,
-    WinCombat,
-    GameOver,
-    Inventory,
-    Battle,
-    Map,
-    Shop,
-    Event,
-}
+
 
 public class UIManager : MonoBehaviour
 {
     [Header("UI Manager")]
     [SerializeField] private GameObject mainMenuUI;
     [SerializeField] private GameObject settingsUI;
-    [SerializeField] private GameObject winCombatMenuUI;
-    [SerializeField] private GameObject gameOverUI;
-    [SerializeField] private GameObject inventoryUI;
     [SerializeField] private GameObject battleUI;
-    [SerializeField] private GameObject mapUI;
-    [SerializeField] private GameObject shopMenuUI;
-    [SerializeField] private GameObject eventUI;
 
     [Header("Battle UI")]
     [SerializeField] private GameObject attackButtonsGroup; // <-- Use this instead of array
-    [SerializeField] private GameObject[] menuButtons;
-    [SerializeField] private GameObject enemySprite;
-    [SerializeField] private GameObject enemyHealthBarText;
+    [SerializeField] private GameObject[] combatMenuButtons;
     [SerializeField] private GameObject playerHealthBarText;
     [SerializeField] private GameObject combatText;
+
+    [Header("Enemy Combat UI")]
+    [SerializeField] private GameObject enemySprite;
+    [SerializeField] private GameObject enemyHealthBarText;
+    [SerializeField] private GameObject enemyChoiceRockImage;
+    [SerializeField] private GameObject enemyChoicePaperImage;
+    [SerializeField] private GameObject enemyChoiceScissorsImage;
+
+    [Header("Inventory UI")]
+    [SerializeField] private GameObject inventoryUI;
+    [SerializeField] private GameObject cardInventoryUI;
+    [SerializeField] private GameObject itemInventoryUI;
+
+    [Header("Combat Win UI")]
+    [SerializeField] private GameObject winCombatMenuUI;
+    [SerializeField] private GameObject shopMenuUI;
+
+    [Header("Combat Lose UI")]
+    [SerializeField] private GameObject loseCombatMenuUI;
+    [SerializeField] private GameObject goldEarnedText;
+    [SerializeField] private GameObject totalBattleWonText;
+
+    [Header("Shop UI")]
+    [SerializeField] private GameObject shopItemOne;
+    [SerializeField] private GameObject shopItemTwo;
+    [SerializeField] private GameObject shopItemThree;
+
+    [Header("Pause Menu UI")]
+    [SerializeField] private GameObject pauseMenuUI;
+
 
     private PlayerManager playerManager;
     private BattleManager battleManager;
@@ -48,36 +59,29 @@ public class UIManager : MonoBehaviour
         enemyManager = FindObjectOfType<EnemyManager>();
         battleManager = FindObjectOfType<BattleManager>();
 
-        uiPanels = new Dictionary<UIEnum, GameObject>
-        {
-            { UIEnum.MainMenu, mainMenuUI },
-            { UIEnum.Settings, settingsUI },
-            { UIEnum.WinCombat, winCombatMenuUI },
-            { UIEnum.GameOver, gameOverUI },
-            { UIEnum.Inventory, inventoryUI },
-            { UIEnum.Battle, battleUI },
-            { UIEnum.Map, mapUI },
-            { UIEnum.Shop, shopMenuUI },
-            { UIEnum.Event, eventUI }
-        };
-    }
+    }     
 
     private void Start()
     {
-        SetActiveUI(UIEnum.MainMenu);
+        
+        SetMainMenuActive();
     }
-
     private void Update()
     {
         if (playerManager != null && enemyManager != null)
         {
             SetEnemyHealthBarText(enemyManager.EnemyHealth.ToString());
             SetPlayerHealthBarText(playerManager.CurrentHealth.ToString());
-            SetCombatText("Player's Turn");
             SetEnemySprite(enemyManager.EnemyPrefab.GetComponent<SpriteRenderer>().sprite);
+            SetCombatText("Player's Turn");
         }
 
         StartCoroutine(CombatTextUpdate());
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            TogglePauseMenu();
+        }
     }
 
     private IEnumerator CombatTextUpdate()
@@ -111,19 +115,76 @@ public class UIManager : MonoBehaviour
 
     // --- UI BUTTON FUNCTIONS ---
 
-    public void SetActiveUI(UIEnum uiEnum)
+    public void SetMainMenuActive()
     {
-        foreach (var panel in uiPanels)
-        {
-            if (panel.Value != null)
-                panel.Value.SetActive(panel.Key == uiEnum);
-        }
+        mainMenuUI.SetActive(true);
+    }
+
+    public void SetSettingsActive()
+    {
+        settingsUI.SetActive(true);
+        mainMenuUI.SetActive(false);
+    }
+    public void SetLoseCombatMenuActive()
+    {
+        loseCombatMenuUI.SetActive(true);
+        battleUI.SetActive(false);
+        inventoryUI.SetActive(false);
+        goldEarnedText.GetComponent<UnityEngine.UI.Text>().text = "Gold Earned: " + playerManager.PlayerGold;
+    }
+
+    public void SetInventoryActive()
+    {
+        inventoryUI.SetActive(true);
+        mainMenuUI.SetActive(false);
+    }
+    public void SetBattleActive()
+    {
+        battleUI.SetActive(true);
+        mainMenuUI.SetActive(false);
+        inventoryUI.SetActive(false);
+        loseCombatMenuUI.SetActive(false);
+    }
+    public void SetWinCombatMenuActive()
+    {
+        winCombatMenuUI.SetActive(true);
+        battleUI.SetActive(false);
+        shopMenuUI.SetActive(false);
+        RandomizeShopItems(); // Randomize the shop items when the win menu is activated
+    }
+    public void SetShopMenuActive()
+    {
+        shopMenuUI.SetActive(true);
+        winCombatMenuUI.SetActive(false);
+        battleUI.SetActive(false);
+        UpdateShopUI(); // Update the UI to show the new items
+    }
+    public void SetInventoryCardActive()
+    {
+        cardInventoryUI.SetActive(true);
+        itemInventoryUI.SetActive(false);
     }
 
     public void QuitGame()
     {
         Application.Quit();
         Debug.Log("Quit Game");
+    }
+
+    public void OnResetButtonPressed()
+    {
+        playerManager.ResetPlayer();
+        enemyManager.ResetEnemy();
+        UpdateStatsUI();
+        SetMainMenuActive();
+    }
+
+    public void OnStartNewBattle()
+    {
+        playerManager.StartNewBattle();
+        enemyManager.ResetEnemy();
+        SetBattleActive();
+        UpdateStatsUI();
     }
 
     // --- UI ELEMENT HELPERS ---
@@ -149,9 +210,9 @@ public class UIManager : MonoBehaviour
         if (attackButtonsGroup != null)
             attackButtonsGroup.SetActive(isActive);
 
-        if (menuButtons != null)
+        if (combatMenuButtons != null)
         {
-            foreach (var button in menuButtons)
+            foreach (var button in combatMenuButtons)
             {
                 if (button != null)
                     button.SetActive(!isActive);
@@ -159,9 +220,62 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // --- SHOP/INVENTORY EXAMPLE ---
+    // List of all possible shop items (assign in Inspector or populate at runtime)
+    [SerializeField] private List<Item> allShopItems = new List<Item>();
 
-    private void BuyItem(GameObject item)
+    // Array to hold the 3 items available to buy this round
+    [SerializeField] private Item[] availableShopItems = new Item[3];
+
+    // Call this after winning a round to randomize the shop items
+    public void RandomizeShopItems()
+    {
+        List<Item> pool = new List<Item>(allShopItems);
+        for (int i = 0; i < availableShopItems.Length; i++)
+        {
+            if (pool.Count == 0) break;
+            int randomIndex = Random.Range(0, pool.Count);
+            availableShopItems[i] = pool[randomIndex];
+            pool.RemoveAt(randomIndex);
+        }
+        UpdateShopUI();
+    }
+
+    // Call this from each of the 3 shop buttons, passing 0, 1, or 2
+    public void BuyShopItem(int shopSlot)
+    {
+        if (shopSlot < 0 || shopSlot >= availableShopItems.Length)
+        {
+            Debug.Log("Invalid shop slot.");
+            return;
+        }
+        Item item = availableShopItems[shopSlot];
+        BuyItem(item);
+    }
+
+    // Update the shop UI to show the 3 available items
+    private void UpdateShopUI()
+    {
+        GameObject[] shopDisplays = new GameObject[] { shopItemOne, shopItemTwo, shopItemThree };
+
+        for (int i = 0; i < shopDisplays.Length; i++)
+        {
+            if (i < availableShopItems.Length && availableShopItems[i] != null && shopDisplays[i] != null)
+            {
+                var displayImage = shopDisplays[i].GetComponent<UnityEngine.UI.Image>();
+                if (displayImage != null)
+                    displayImage.sprite = availableShopItems[i].itemImage; // Assuming your Item has a 'itemImage' field
+
+                shopDisplays[i].SetActive(true);
+            }
+            else if (shopDisplays[i] != null)
+            {
+                shopDisplays[i].SetActive(false);
+            }
+        }
+    }
+
+    // Update BuyItem to accept Item instead of GameObject
+    private void BuyItem(Item item)
     {
         if (item == null)
         {
@@ -173,58 +287,39 @@ public class UIManager : MonoBehaviour
             Debug.Log("Inventory is full.");
             return;
         }
-        if (item.GetComponent<Item>().itemValue > playerManager.PlayerGold)
+        if (item.itemValue > playerManager.PlayerGold)
         {
             Debug.Log("Not enough Gold to buy this item.");
             return;
         }
-        playerManager.PlayerGold -= item.GetComponent<Item>().itemValue;
-        playerManager.inventory.Add(item.GetComponent<Item>());
-        item.SetActive(false);
+        playerManager.PlayerGold -= item.itemValue;
+        playerManager.inventory.Add(item);
+        // Optionally, remove from shop or mark as sold
+        UpdateShopUI();
     }
 
-    // Call this to show the battle UI and hide menus/inventory
-    public void ShowBattleUI()
+    // Example: Show total gold earned and battles won in your UI
+    public void UpdateStatsUI()
     {
-        battleUI.SetActive(true);
-        settingsUI.SetActive(false);
-        inventoryUI.SetActive(false);
-        attackButtonsGroup.SetActive(false);
+        if (goldEarnedText != null)
+            goldEarnedText.GetComponent<UnityEngine.UI.Text>().text = "Gold Earned: " + playerManager.totalGoldEarned;
+        if (totalBattleWonText != null)
+            totalBattleWonText.GetComponent<UnityEngine.UI.Text>().text = "Battles Won: " + playerManager.totalBattlesWon;
     }
 
-    // Call this to open the settings (menu)
-    public void ShowSettingsMenu()
+    // Call this to toggle the pause menu
+    public void TogglePauseMenu()
     {
-        battleUI.SetActive(false);
-        settingsUI.SetActive(true);
-        inventoryUI.SetActive(false);
-        attackButtonsGroup.SetActive(false);
-    }
-
-    // Call this to open the card inventory
-    public void ShowCardInventory()
-    {
-        battleUI.SetActive(false);
-        settingsUI.SetActive(false);
-        inventoryUI.SetActive(true);
-        attackButtonsGroup.SetActive(false);
-    }
-
-    // Call this to show attack buttons (and hide others if needed)
-    public void ShowAttackButtons()
-    {
-        battleUI.SetActive(true);
-        settingsUI.SetActive(false);
-        inventoryUI.SetActive(false);
-        attackButtonsGroup.SetActive(true);
-    }
-
-    // Optional: Hide all overlays (for transitions, etc.)
-    public void HideAllMenus()
-    {
-        battleUI.SetActive(false);
-        settingsUI.SetActive(false);
-        inventoryUI.SetActive(false);
-        attackButtonsGroup.SetActive(false);
+        bool isPaused = Time.timeScale == 0;
+        if (isPaused)
+        {
+            Time.timeScale = 1;
+            if (pauseMenuUI != null) pauseMenuUI.SetActive(false);
+        }
+        else
+        {
+            Time.timeScale = 0;
+            if (pauseMenuUI != null) pauseMenuUI.SetActive(true);
+        }
     }
 }
