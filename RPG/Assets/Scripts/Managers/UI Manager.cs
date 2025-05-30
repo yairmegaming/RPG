@@ -46,6 +46,9 @@ public class UIManager : MonoBehaviour
     [Header("Pause Menu UI")]
     [SerializeField] private GameObject pauseMenuUI;
 
+    [Header("Event UI (Not Used Yet)")]
+    [SerializeField] private GameObject eventUI;
+
 
     private PlayerManager playerManager;
     private BattleManager battleManager;
@@ -115,54 +118,57 @@ public class UIManager : MonoBehaviour
 
     // --- UI BUTTON FUNCTIONS ---
 
+    // Example for UI panels
     public void SetMainMenuActive()
     {
-        mainMenuUI.SetActive(true);
+        if (mainMenuUI != null)
+            mainMenuUI.SetActive(true);
     }
 
     public void SetSettingsActive()
     {
-        settingsUI.SetActive(true);
-        mainMenuUI.SetActive(false);
+        if (settingsUI != null) settingsUI.SetActive(true);
+        if (mainMenuUI != null) mainMenuUI.SetActive(false);
     }
     public void SetLoseCombatMenuActive()
     {
-        loseCombatMenuUI.SetActive(true);
-        battleUI.SetActive(false);
-        inventoryUI.SetActive(false);
-        goldEarnedText.GetComponent<UnityEngine.UI.Text>().text = "Gold Earned: " + playerManager.PlayerGold;
+        if (loseCombatMenuUI != null) loseCombatMenuUI.SetActive(true);
+        if (battleUI != null) battleUI.SetActive(false);
+        if (inventoryUI != null) inventoryUI.SetActive(false);
+        if (goldEarnedText != null && playerManager != null)
+            goldEarnedText.GetComponent<UnityEngine.UI.Text>().text = "Gold Earned: " + playerManager.PlayerGold;
     }
 
     public void SetInventoryActive()
     {
-        inventoryUI.SetActive(true);
-        mainMenuUI.SetActive(false);
+        if (inventoryUI != null) inventoryUI.SetActive(true);
+        if (mainMenuUI != null) mainMenuUI.SetActive(false);
     }
     public void SetBattleActive()
     {
-        battleUI.SetActive(true);
-        mainMenuUI.SetActive(false);
-        inventoryUI.SetActive(false);
-        loseCombatMenuUI.SetActive(false);
+        if (battleUI != null) battleUI.SetActive(true);
+        if (mainMenuUI != null) mainMenuUI.SetActive(false);
+        if (inventoryUI != null) inventoryUI.SetActive(false);
+        if (loseCombatMenuUI != null) loseCombatMenuUI.SetActive(false);
     }
     public void SetWinCombatMenuActive()
     {
-        winCombatMenuUI.SetActive(true);
-        battleUI.SetActive(false);
-        shopMenuUI.SetActive(false);
-        RandomizeShopItems(); // Randomize the shop items when the win menu is activated
+        if (winCombatMenuUI != null) winCombatMenuUI.SetActive(true);
+        if (battleUI != null) battleUI.SetActive(false);
+        if (shopMenuUI != null) shopMenuUI.SetActive(false);
+        RandomizeShopItems();
     }
     public void SetShopMenuActive()
     {
-        shopMenuUI.SetActive(true);
-        winCombatMenuUI.SetActive(false);
-        battleUI.SetActive(false);
-        UpdateShopUI(); // Update the UI to show the new items
+        if (shopMenuUI != null) shopMenuUI.SetActive(true);
+        if (winCombatMenuUI != null) winCombatMenuUI.SetActive(false);
+        if (battleUI != null) battleUI.SetActive(false);
+        UpdateShopUI();
     }
     public void SetInventoryCardActive()
     {
-        cardInventoryUI.SetActive(true);
-        itemInventoryUI.SetActive(false);
+        if (cardInventoryUI != null) cardInventoryUI.SetActive(true);
+        if (itemInventoryUI != null) itemInventoryUI.SetActive(false);
     }
 
     public void QuitGame()
@@ -187,23 +193,32 @@ public class UIManager : MonoBehaviour
         UpdateStatsUI();
     }
 
+    public void SetEventActive()
+    {
+        if (eventUI != null) eventUI.SetActive(false);
+    }
+
     // --- UI ELEMENT HELPERS ---
 
     private void SetEnemyHealthBarText(string text)
     {
-        enemyHealthBarText.GetComponent<UnityEngine.UI.Text>().text = text;
+        if (enemyHealthBarText != null)
+            enemyHealthBarText.GetComponent<UnityEngine.UI.Text>().text = text;
     }
     private void SetPlayerHealthBarText(string text)
     {
-        playerHealthBarText.GetComponent<UnityEngine.UI.Text>().text = text;
+        if (playerHealthBarText != null)
+            playerHealthBarText.GetComponent<UnityEngine.UI.Text>().text = text;
     }
     private void SetCombatText(string text)
     {
-        combatText.GetComponent<UnityEngine.UI.Text>().text = text;
+        if (combatText != null)
+            combatText.GetComponent<UnityEngine.UI.Text>().text = text;
     }
     private void SetEnemySprite(Sprite sprite)
     {
-        enemySprite.GetComponent<UnityEngine.UI.Image>().sprite = sprite;
+        if (enemySprite != null)
+            enemySprite.GetComponent<UnityEngine.UI.Image>().sprite = sprite;
     }
     private void SetAttackButtonsActive(bool isActive)
     {
@@ -277,49 +292,47 @@ public class UIManager : MonoBehaviour
     // Update BuyItem to accept Item instead of GameObject
     private void BuyItem(Item item)
     {
-        if (item == null)
+        if (item == null) return;
+
+        // Check if the player can afford the item
+        if (playerManager.PlayerGold < item.itemValue)
         {
-            Debug.Log("Item is Sold.");
+            Debug.Log("Not enough gold to buy this item.");
             return;
         }
-        if (playerManager.inventory.Count >= playerManager.inventorySize)
-        {
-            Debug.Log("Inventory is full.");
-            return;
-        }
-        if (item.itemValue > playerManager.PlayerGold)
-        {
-            Debug.Log("Not enough Gold to buy this item.");
-            return;
-        }
+
+        // Deduct the cost from the player's gold
         playerManager.PlayerGold -= item.itemValue;
-        playerManager.inventory.Add(item);
-        // Optionally, remove from shop or mark as sold
-        UpdateShopUI();
+
+        // Add the item to the player's inventory
+        playerManager.AddItemToInventory(item);
+
+        // Optionally, you can also update the UI or provide feedback to the player
+        Debug.Log("Bought item: " + item.itemName);
     }
 
-    // Example: Show total gold earned and battles won in your UI
-    public void UpdateStatsUI()
+// Simple pause menu toggle
+public void TogglePauseMenu()
+{
+    bool isPaused = Time.timeScale == 0;
+    if (isPaused)
     {
-        if (goldEarnedText != null)
-            goldEarnedText.GetComponent<UnityEngine.UI.Text>().text = "Gold Earned: " + playerManager.totalGoldEarned;
-        if (totalBattleWonText != null)
-            totalBattleWonText.GetComponent<UnityEngine.UI.Text>().text = "Battles Won: " + playerManager.totalBattlesWon;
+        Time.timeScale = 1;
+        if (pauseMenuUI != null) pauseMenuUI.SetActive(false);
     }
+    else
+    {
+        Time.timeScale = 0;
+        if (pauseMenuUI != null) pauseMenuUI.SetActive(true);
+    }
+}
 
-    // Call this to toggle the pause menu
-    public void TogglePauseMenu()
-    {
-        bool isPaused = Time.timeScale == 0;
-        if (isPaused)
-        {
-            Time.timeScale = 1;
-            if (pauseMenuUI != null) pauseMenuUI.SetActive(false);
-        }
-        else
-        {
-            Time.timeScale = 0;
-            if (pauseMenuUI != null) pauseMenuUI.SetActive(true);
-        }
-    }
+// Update stats UI (call after gold/battle win changes)
+public void UpdateStatsUI()
+{
+    if (goldEarnedText != null && playerManager != null)
+        goldEarnedText.GetComponent<UnityEngine.UI.Text>().text = "Gold Earned: " + playerManager.totalGoldEarned;
+    if (totalBattleWonText != null && playerManager != null)
+        totalBattleWonText.GetComponent<UnityEngine.UI.Text>().text = "Battles Won: " + playerManager.totalBattlesWon;
+}
 }

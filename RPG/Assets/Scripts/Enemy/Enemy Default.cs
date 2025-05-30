@@ -17,7 +17,7 @@ public class EnemyDefault : MonoBehaviour
     [Header("Enemy Score")]
     public int EnemyScoreWorth = 0;
 
-    [Header("Enemy Animation")]
+    [Header("Enemy Animation (Optional)")]
     public Animator enemyAnimator;
     public RuntimeAnimatorController enemyAnimatorController;
 
@@ -33,7 +33,8 @@ public class EnemyDefault : MonoBehaviour
 
     private void Awake()
     {
-        enemyManagerScript = EnemyManager.GetComponent<EnemyManager>();
+        if (EnemyManager != null)
+            enemyManagerScript = EnemyManager.GetComponent<EnemyManager>();
     }
 
     private void Start()
@@ -43,7 +44,8 @@ public class EnemyDefault : MonoBehaviour
 
     private void InitializeEnemy()
     {
-        enemyManagerScript.EnemyChoice = EnemyChoiceEnum.none;
+        if (enemyManagerScript != null)
+            enemyManagerScript.EnemyChoice = EnemyChoiceEnum.none;
         EnemyCurrentHealth = EnemyHealth;
         EnemyCurrentDamage = EnemyDamage;
         EnemyCurrentDefense = EnemyDefense;
@@ -97,8 +99,25 @@ public class EnemyDefault : MonoBehaviour
         }
     }
 
-    public void EnemyAttackAnimation() => enemyAnimator.SetTrigger("Attack");
-    public void EnemyDefendAnimation() => enemyAnimator.SetTrigger("Defend");
-    public void EnemyDamagedAnimation() => enemyAnimator.SetTrigger("Damaged");
-    public void EnemyDeathAnimation() => enemyAnimator.SetTrigger("Died");
+    // Animation methods are now safe to call even if no Animator is assigned
+    public void EnemyAttackAnimation()
+    {
+        if (enemyAnimator != null)
+            enemyAnimator.SetTrigger("Attack");
+    }
+    public void EnemyDefendAnimation()
+    {
+        if (enemyAnimator != null)
+            enemyAnimator.SetTrigger("Defend");
+    }
+    public void EnemyDamagedAnimation()
+    {
+        if (enemyAnimator != null)
+            enemyAnimator.SetTrigger("Damaged");
+    }
+    public void EnemyDeathAnimation()
+    {
+        if (enemyAnimator != null)
+            enemyAnimator.SetTrigger("Died");
+    }
 }

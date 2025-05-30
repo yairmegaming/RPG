@@ -7,6 +7,8 @@ public class InventorySaveLoad : MonoBehaviour
 
     public void SaveInventory()
     {
+        if (playerManager == null) return;
+
         List<string> itemIDs = new List<string>();
         foreach (var item in playerManager.inventory)
         {
@@ -24,6 +26,8 @@ public class InventorySaveLoad : MonoBehaviour
 
     public void LoadInventory()
     {
+        if (playerManager == null) return;
+
         string inventoryData = PlayerPrefs.GetString("Inventory", "");
         string[] itemIDs = inventoryData.Split(',');
 

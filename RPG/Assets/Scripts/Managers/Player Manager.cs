@@ -37,7 +37,7 @@ public class PlayerManager : MonoBehaviour
     private PlayerChoiceEnum playerChoice;
     private int currentHealth;
 
-    private PlayerCombat PlayerCombat => player.GetComponent<PlayerCombat>();
+    private PlayerCombat PlayerCombat => player != null ? player.GetComponent<PlayerCombat>() : null;
 
     public int ModifiedDamage => baseDamage +
         (equippedNecklace ? equippedNecklace.itemDamage : 0) +
@@ -101,19 +101,26 @@ public class PlayerManager : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        PlayerCombat.TakeDamage(damage);
-        CurrentHealth = PlayerCombat.CurrentHealth;
+        if (PlayerCombat != null)
+        {
+            PlayerCombat.TakeDamage(damage);
+            CurrentHealth = PlayerCombat.CurrentHealth;
+        }
     }
 
     public void Heal(int healAmount)
     {
-        PlayerCombat.Heal(healAmount);
-        CurrentHealth = PlayerCombat.CurrentHealth;
+        if (PlayerCombat != null)
+        {
+            PlayerCombat.Heal(healAmount);
+            CurrentHealth = PlayerCombat.CurrentHealth;
+        }
     }
 
     public void Defend(int damage)
     {
-        PlayerCombat.OnDefense(damage);
+        if (PlayerCombat != null)
+            PlayerCombat.OnDefense(damage);
     }
 
     public void MakeChoice(PlayerChoiceEnum choice)

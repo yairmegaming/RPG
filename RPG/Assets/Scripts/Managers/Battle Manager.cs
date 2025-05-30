@@ -141,6 +141,9 @@ public class BattleManager : MonoBehaviour
 
     private void EndBattle()
     {
+        if (playerManagerScript == null || enemyManagerScript == null || uiManager == null)
+            return;
+
         if (playerManagerScript.CurrentHealth > 0 && enemyManagerScript.EnemyHealth <= 0)
         {
             playerManagerScript.RegisterBattleWin();

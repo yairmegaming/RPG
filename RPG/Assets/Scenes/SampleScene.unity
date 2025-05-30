@@ -481,7 +481,7 @@ GameObject:
   - component: {fileID: 116684244}
   - component: {fileID: 116684243}
   m_Layer: 5
-  m_Name: Menu_Button
+  m_Name: Pause_Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5766,7 +5766,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Cards
+  m_text: 'Inventory
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5931,7 +5933,7 @@ GameObject:
   - component: {fileID: 978887221}
   - component: {fileID: 978887220}
   m_Layer: 5
-  m_Name: Cards_Button
+  m_Name: Inventory_Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8204,7 +8206,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1297990975
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8491,7 +8493,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1353450999
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9502,7 +9504,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Menu
+  m_text: 'Pause
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -9961,6 +9965,7 @@ MonoBehaviour:
   shopItemOne: {fileID: 153568177}
   shopItemTwo: {fileID: 2004566055}
   shopItemThree: {fileID: 1422818163}
+  pauseMenuUI: {fileID: 0}
   allShopItems: []
   availableShopItems:
   - {fileID: 0}
