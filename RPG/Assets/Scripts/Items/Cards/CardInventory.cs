@@ -1,3 +1,4 @@
+#if ENABLE_CARDS
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -60,3 +61,4 @@ public class CardInventory : MonoBehaviour
         }
     }
 }
+#endif

@@ -25,10 +25,6 @@ public class PlayerManager : MonoBehaviour
     public List<Item> inventory = new List<Item>();
     public int inventorySize = 20;
 
-    [Header("Player Cards")]
-    public List<Card> cardDeck = new List<Card>();
-    public int maxDeckSize = 10;
-
     [Header("Player Stats Tracking")]
     public int totalGoldEarned = 0;
     public int totalBattlesWon = 0;
@@ -213,56 +209,6 @@ public class PlayerManager : MonoBehaviour
         PlayerCombat.UpdatePlayerStats();
     }
 
-    // Card management
-    public void AddCardToDeck(Card card)
-    {
-        if (card == null || cardDeck.Count >= maxDeckSize)
-        {
-            Debug.LogWarning("Cannot add card to deck.");
-            return;
-        }
-        cardDeck.Add(card);
-        Debug.Log($"Added {card.cardName} to deck.");
-    }
-
-    public void RemoveCardFromDeck(Card card)
-    {
-        if (card == null || !cardDeck.Contains(card))
-        {
-            Debug.LogWarning("Cannot remove card from deck.");
-            return;
-        }
-        cardDeck.Remove(card);
-        Debug.Log($"Removed {card.cardName} from deck.");
-    }
-
-    public void UseCard(Card card)
-    {
-        if (card == null || !cardDeck.Contains(card))
-        {
-            Debug.LogWarning("Cannot use card.");
-            return;
-        }
-        // Example: apply card effect
-        switch (card.cardType)
-        {
-            case CardType.Attack:
-                // Deal damage to enemy
-                break;
-            case CardType.Heal:
-                Heal(card.cardPower);
-                break;
-            case CardType.Buff:
-                // Apply buff
-                break;
-            case CardType.Debuff:
-                // Apply debuff to enemy
-                break;
-        }
-        RemoveCardFromDeck(card);
-        Debug.Log($"Used card: {card.cardName}");
-    }
-
     // Call this whenever the player receives gold (from any source)
     public void AddGold(int amount)
     {
@@ -291,28 +237,27 @@ public class PlayerManager : MonoBehaviour
         CurrentHealth = ModifiedMaxHealth;
         PlayerGold = 0;
         inventory.Clear();
-        cardDeck.Clear();
         totalGoldEarned = 0;
         totalBattlesWon = 0;
         Debug.Log("Player reset. All stats and progress cleared.");
     }
 
-    public void ApplyDebuff(CardStatType statType, float multiplier)
-    {
-        switch (statType)
-        {
-            case CardStatType.Attack:
-                ModifiedDamage = Mathf.RoundToInt(ModifiedDamage * multiplier);
-                break;
-            case CardStatType.Defense:
-                ModifiedDefense = Mathf.RoundToInt(ModifiedDefense * multiplier);
-                break;
-            case CardStatType.Health:
-                CurrentHealth = Mathf.RoundToInt(CurrentHealth * multiplier);
-                break;
-        }
-        // Optionally, add logic to reset these at the end of the turn
-    }
+    //public void ApplyDebuff(CardStatType statType, float multiplier)
+    //{
+    //    switch (statType)
+    //    {
+    //        case CardStatType.Attack:
+    //            ModifiedDamage = Mathf.RoundToInt(ModifiedDamage * multiplier);
+    //            break;
+    //        case CardStatType.Defense:
+    //            ModifiedDefense = Mathf.RoundToInt(ModifiedDefense * multiplier);
+    //            break;
+    //        case CardStatType.Health:
+    //            CurrentHealth = Mathf.RoundToInt(CurrentHealth * multiplier);
+    //            break;
+    //    }
+    //    // Optionally, add logic to reset these at the end of the turn
+    //}
 
     private List<BuffEffect> activeBuffs = new List<BuffEffect>();
 

@@ -154,26 +154,27 @@ public class EnemyManager : MonoBehaviour
         enemyDefault.paperChance = selectedData.paperChance;
         enemyDefault.scissorsChance = selectedData.scissorsChance;
 
-        enemyDefault.enemyCards.Clear();
-        enemyDefault.ResetEnemyCardsForCombat();
+        // Card system disabled
+        // enemyDefault.enemyCards.Clear();
+        // enemyDefault.ResetEnemyCardsForCombat();
 
-        var allCards = GameDatabase.Instance.allCards; // List<Card>
-        if (allCards != null && allCards.Count > 0)
-        {
-            // Only allow cards of same or lower rarity
-            var allowedCards = allCards.FindAll(card => (int)card.itemRarity <= (int)selectedData.rarity);
+        // var allCards = GameDatabase.Instance.allCards; // List<Card>
+        // if (allCards != null && allCards.Count > 0)
+        // {
+        //     // Only allow cards of same or lower rarity
+        //     var allowedCards = allCards.FindAll(card => (int)card.itemRarity <= (int)selectedData.rarity);
 
-            // The higher the rarity, the more cards (e.g., Common:1, Uncommon:2, Rare:3, Epic:4, Legendary:5)
-            int cardsToAssign = Mathf.Clamp((int)selectedData.rarity + 1, 1, 5);
+        //     // The higher the rarity, the more cards (e.g., Common:1, Uncommon:2, Rare:3, Epic:4, Legendary:5)
+        //     int cardsToAssign = Mathf.Clamp((int)selectedData.rarity + 1, 1, 5);
 
-            // Randomly assign cards
-            for (int i = 0; i < cardsToAssign && allowedCards.Count > 0; i++)
-            {
-                int idx = Random.Range(0, allowedCards.Count);
-                enemyDefault.enemyCards.Add(allowedCards[idx]);
-                allowedCards.RemoveAt(idx);
-            }
-        }
+        //     // Randomly assign cards
+        //     for (int i = 0; i < cardsToAssign && allowedCards.Count > 0; i++)
+        //     {
+        //         int idx = Random.Range(0, allowedCards.Count);
+        //         enemyDefault.enemyCards.Add(allowedCards[idx]);
+        //         allowedCards.RemoveAt(idx);
+        //     }
+        // }
 
         enemyPrefab.tag = "Enemy";
     }

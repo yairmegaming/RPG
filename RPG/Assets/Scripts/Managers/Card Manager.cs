@@ -16,7 +16,8 @@ public class CardManager : MonoBehaviour
 
     public void PlayCard(Card card)
     {
-        playerManager.UseCard(card);
+        // Card system disabled
+        // playerManager.UseCard(card);
         // Optionally trigger UI updates, animations, etc.
     }
 }

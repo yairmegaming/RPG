@@ -7,19 +7,21 @@ public class CardInventorySlot : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == PointerEventData.InputButton.Left)
-        {
-            if (CardInventory.Singleton.carriedCard == null) return;
-            SetCard(CardInventory.Singleton.carriedCard);
-        }
+        // Card system disabled
+        // if (eventData.button == PointerEventData.InputButton.Left)
+        // {
+        //     if (CardInventory.Singleton.carriedCard == null) return;
+        //     SetCard(CardInventory.Singleton.carriedCard);
+        // }
     }
 
     public void SetCard(CardInventoryItem cardItem)
     {
-        CardInventory.Singleton.carriedCard = null;
-        myCardItem = cardItem;
-        myCardItem.activeSlot = this;
-        myCardItem.transform.SetParent(transform);
-        myCardItem.canvasGroup.blocksRaycasts = true;
+        // Card system disabled
+        // CardInventory.Singleton.carriedCard = null;
+        // myCardItem = cardItem;
+        // myCardItem.activeSlot = this;
+        // myCardItem.transform.SetParent(transform);
+        // myCardItem.canvasGroup.blocksRaycasts = true;
     }
 }

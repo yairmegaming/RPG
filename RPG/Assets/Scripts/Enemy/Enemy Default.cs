@@ -27,10 +27,6 @@ public class EnemyDefault : MonoBehaviour
     [Range(0, 100)] public int paperChance = 33;
     [Range(0, 100)] public int scissorsChance = 34;
 
-    [Header("Enemy Cards")]
-    public List<Card> enemyCards = new List<Card>();
-    private HashSet<Card> usedCardsThisCombat = new HashSet<Card>();
-
     // Buff tracking
     private float attackBuffMultiplier = 1f;
     private float defenseBuffMultiplier = 1f;
@@ -142,23 +138,6 @@ public class EnemyDefault : MonoBehaviour
             enemyAnimator.SetTrigger("Died");
     }
 
-    public void ResetEnemyCardsForCombat()
-    {
-        usedCardsThisCombat.Clear();
-        ResetBuffs();
-    }
-
-    public bool CanUseCard(Card card)
-    {
-        return card != null && !usedCardsThisCombat.Contains(card);
-    }
-
-    public void MarkCardUsed(Card card)
-    {
-        if (card != null)
-            usedCardsThisCombat.Add(card);
-    }
-
     public void ResetBuffs()
     {
         attackBuffMultiplier = 1f;
@@ -176,94 +155,42 @@ public class EnemyDefault : MonoBehaviour
     }
 
     // --- Card Play Logic ---
-    public void PlayAvailableCards(PlayerManager playerManager)
-    {
-        foreach (var card in enemyCards)
-        {
-            if (CanUseCard(card))
-            {
-                ApplyCardEffect(card, playerManager);
-                MarkCardUsed(card);
-                // If you want only one card per turn, break here
-                break;
-            }
-        }
-    }
+    //public void ApplyBuffOrDebuff(BuffTargetStat stat, float multiplier, int turns)
+    //{
+    //    turns = Mathf.Min(turns, 5);
+    //    activeBuffs.Add(new BuffEffect(stat, multiplier, turns));
+    //    UpdateStatsWithBuffs();
+    //}
 
-    private void ApplyCardEffect(Card card, PlayerManager playerManager)
-    {
-        float multiplier = card.effectMultiplier;
-        switch (card.effectType)
-        {
-            case CardEffectType.BuffSelf:
-                ApplyBuff(card.statType, multiplier);
-                break;
-            case CardEffectType.DebuffEnemy:
-                if (playerManager != null)
-                    playerManager.ApplyDebuff(card.statType, multiplier);
-                break;
-        }
-        Debug.Log($"Enemy used card: {card.cardName} ({card.effectType} {card.statType} x{multiplier})");
-    }
+    //public void UpdateStatsWithBuffs()
+    //{
+    //    float attackMult = 1f, defenseMult = 1f, healthMult = 1f;
+    //    foreach (var buff in activeBuffs)
+    //    {
+    //        switch (buff.stat)
+    //        {
+    //            case BuffTargetStat.Attack: attackMult *= buff.multiplier; break;
+    //            case BuffTargetStat.Defense: defenseMult *= buff.multiplier; break;
+    //            case BuffTargetStat.Health: healthMult *= buff.multiplier; break;
+    //        }
+    //    }
+    //    // Replace EnemyDamage/EnemyDefense/EnemyHealth with your actual stat logic
+    //    // Example:
+    //    // EnemyDamage = Mathf.RoundToInt(baseDamage * attackMult);
+    //    // EnemyDefense = Mathf.RoundToInt(baseDefense * defenseMult);
+    //    // EnemyHealth = Mathf.Min(Mathf.RoundToInt(baseHealth * healthMult), EnemyHealth);
+    //}
 
-    private void ApplyBuff(CardStatType statType, float multiplier)
-    {
-        switch (statType)
-        {
-            case CardStatType.Attack:
-                attackBuffMultiplier *= multiplier;
-                EnemyCurrentDamage = Mathf.RoundToInt(baseDamage * attackBuffMultiplier);
-                break;
-            case CardStatType.Defense:
-                defenseBuffMultiplier *= multiplier;
-                EnemyCurrentDefense = Mathf.RoundToInt(baseDefense * defenseBuffMultiplier);
-                break;
-            case CardStatType.Health:
-                healthBuffMultiplier *= multiplier;
-                int newHealth = Mathf.RoundToInt(baseHealth * healthBuffMultiplier);
-                // Only heal if buff increases health
-                if (newHealth > EnemyCurrentHealth)
-                    EnemyCurrentHealth = newHealth;
-                break;
-        }
-    }
-
-    public void ApplyBuffOrDebuff(BuffTargetStat stat, float multiplier, int turns)
-    {
-        turns = Mathf.Min(turns, 5);
-        activeBuffs.Add(new BuffEffect(stat, multiplier, turns));
-        UpdateStatsWithBuffs();
-    }
-
-    public void UpdateStatsWithBuffs()
-    {
-        float attackMult = 1f, defenseMult = 1f, healthMult = 1f;
-        foreach (var buff in activeBuffs)
-        {
-            switch (buff.stat)
-            {
-                case BuffTargetStat.Attack: attackMult *= buff.multiplier; break;
-                case BuffTargetStat.Defense: defenseMult *= buff.multiplier; break;
-                case BuffTargetStat.Health: healthMult *= buff.multiplier; break;
-            }
-        }
-        // Replace EnemyDamage/EnemyDefense/EnemyHealth with your actual stat logic
-        // Example:
-        // EnemyDamage = Mathf.RoundToInt(baseDamage * attackMult);
-        // EnemyDefense = Mathf.RoundToInt(baseDefense * defenseMult);
-        // EnemyHealth = Mathf.Min(Mathf.RoundToInt(baseHealth * healthMult), EnemyHealth);
-    }
-
-    public void TickBuffs()
-    {
-        for (int i = activeBuffs.Count - 1; i >= 0; i--)
-        {
-            activeBuffs[i].turnsLeft--;
-            if (activeBuffs[i].turnsLeft <= 0)
-                activeBuffs.RemoveAt(i);
-        }
-        UpdateStatsWithBuffs();
-    }
+    //public void TickBuffs()
+    //{
+    //    for (int i = activeBuffs.Count - 1; i >= 0; i--)
+    //    {
+    //        activeBuffs[i].turnsLeft--;
+    //        if (activeBuffs[i].turnsLeft <= 0)
+    //            activeBuffs.RemoveAt(i);
+    //    }
+    //    UpdateStatsWithBuffs();
+    //}
 
     // Example: call this at the start of each enemy turn
 }
