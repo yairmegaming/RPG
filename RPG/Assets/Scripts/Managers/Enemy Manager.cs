@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class EnemyManager : MonoBehaviour
 {
@@ -9,6 +10,15 @@ public class EnemyManager : MonoBehaviour
 
     private PlayerManager playerManager;
     private EnemyManager enemyManager;
+
+    private Dictionary<EnemyRarity, int> rarityWeights = new Dictionary<EnemyRarity, int>
+    {
+        { EnemyRarity.Common, 60 },
+        { EnemyRarity.Uncommon, 25 },
+        { EnemyRarity.Rare, 10 },
+        { EnemyRarity.Epic, 4 },
+        { EnemyRarity.Legendary, 1 }
+    };
 
     public EnemyState EnemyState
     {
@@ -104,27 +114,67 @@ public class EnemyManager : MonoBehaviour
         if (enemyPrefab != null)
             Destroy(enemyPrefab);
 
-        // Get a random enemy prefab from the database
-        var allEnemies = GameDatabase.Instance.allEnemies;
+        // Get all enemy data assets
+        var allEnemies = GameDatabase.Instance.allEnemiesData; // List<EnemyDefaultData>
         if (allEnemies == null || allEnemies.Count == 0)
         {
             Debug.LogWarning("No enemies found in GameDatabase!");
             return;
         }
 
-        int randomIndex = Random.Range(0, allEnemies.Count);
-        GameObject enemyToSpawn = allEnemies[randomIndex];
+        // Get player win count (adjust this if your variable is named differently)
+        int battlesWon = 0;
+        if (playerManager != null)
+            battlesWon = playerManager.totalBattlesWon;
 
-        // Instantiate the enemy prefab
-        enemyPrefab = Instantiate(enemyToSpawn, transform.position, Quaternion.identity, transform);
+        // Use dynamic weights
+        var dynamicWeights = RarityWeightManager.GetEnemyRarityWeights(battlesWon);
 
-        // Get the EnemyDefault component for stat access
+        // Build weighted pool
+        List<EnemyDefaultData> weightedPool = new List<EnemyDefaultData>();
+        foreach (var enemy in allEnemies)
+        {
+            int weight = dynamicWeights.ContainsKey(enemy.rarity) ? dynamicWeights[enemy.rarity] : 1;
+            for (int i = 0; i < weight; i++)
+                weightedPool.Add(enemy);
+        }
+
+        if (weightedPool.Count == 0) return;
+        EnemyDefaultData selectedData = weightedPool[Random.Range(0, weightedPool.Count)];
+
+        // Instantiate a prefab and assign stats from selectedData
+        enemyPrefab = Instantiate(GameDatabase.Instance.enemyPrefab, transform.position, Quaternion.identity, transform);
         enemyDefault = enemyPrefab.GetComponent<EnemyDefault>();
+        enemyDefault.enemySprite = selectedData.enemySprite;
+        enemyDefault.EnemyDamage = selectedData.EnemyDamage;
+        enemyDefault.EnemyHealth = selectedData.EnemyHealth;
+        enemyDefault.EnemyDefense = selectedData.EnemyDefense;
+        enemyDefault.EnemyScoreWorth = selectedData.EnemyScoreWorth;
+        enemyDefault.rockChance = selectedData.rockChance;
+        enemyDefault.paperChance = selectedData.paperChance;
+        enemyDefault.scissorsChance = selectedData.scissorsChance;
 
-        // Optionally, initialize or reset enemy stats here if needed
-        // e.g., enemyDefault.ResetStats();
+        enemyDefault.enemyCards.Clear();
+        enemyDefault.ResetEnemyCardsForCombat();
 
-        // Set tag if needed for compatibility
+        var allCards = GameDatabase.Instance.allCards; // List<Card>
+        if (allCards != null && allCards.Count > 0)
+        {
+            // Only allow cards of same or lower rarity
+            var allowedCards = allCards.FindAll(card => (int)card.itemRarity <= (int)selectedData.rarity);
+
+            // The higher the rarity, the more cards (e.g., Common:1, Uncommon:2, Rare:3, Epic:4, Legendary:5)
+            int cardsToAssign = Mathf.Clamp((int)selectedData.rarity + 1, 1, 5);
+
+            // Randomly assign cards
+            for (int i = 0; i < cardsToAssign && allowedCards.Count > 0; i++)
+            {
+                int idx = Random.Range(0, allowedCards.Count);
+                enemyDefault.enemyCards.Add(allowedCards[idx]);
+                allowedCards.RemoveAt(idx);
+            }
+        }
+
         enemyPrefab.tag = "Enemy";
     }
 

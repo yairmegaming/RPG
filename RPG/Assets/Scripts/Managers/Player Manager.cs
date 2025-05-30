@@ -296,4 +296,62 @@ public class PlayerManager : MonoBehaviour
         totalBattlesWon = 0;
         Debug.Log("Player reset. All stats and progress cleared.");
     }
+
+    public void ApplyDebuff(CardStatType statType, float multiplier)
+    {
+        switch (statType)
+        {
+            case CardStatType.Attack:
+                ModifiedDamage = Mathf.RoundToInt(ModifiedDamage * multiplier);
+                break;
+            case CardStatType.Defense:
+                ModifiedDefense = Mathf.RoundToInt(ModifiedDefense * multiplier);
+                break;
+            case CardStatType.Health:
+                CurrentHealth = Mathf.RoundToInt(CurrentHealth * multiplier);
+                break;
+        }
+        // Optionally, add logic to reset these at the end of the turn
+    }
+
+    private List<BuffEffect> activeBuffs = new List<BuffEffect>();
+
+    public void ApplyBuffOrDebuff(BuffTargetStat stat, float multiplier, int turns)
+    {
+        turns = Mathf.Min(turns, 5);
+        activeBuffs.Add(new BuffEffect(stat, multiplier, turns));
+        UpdateStatsWithBuffs();
+    }
+
+    public void UpdateStatsWithBuffs()
+    {
+        float attackMult = 1f, defenseMult = 1f, healthMult = 1f;
+        foreach (var buff in activeBuffs)
+        {
+            switch (buff.stat)
+            {
+                case BuffTargetStat.Attack: attackMult *= buff.multiplier; break;
+                case BuffTargetStat.Defense: defenseMult *= buff.multiplier; break;
+                case BuffTargetStat.Health: healthMult *= buff.multiplier; break;
+            }
+        }
+        // Replace _modifiedDamage/_modifiedDefense with your actual stat logic
+        // Example:
+        // _modifiedDamage = Mathf.RoundToInt(baseDamage * attackMult);
+        // _modifiedDefense = Mathf.RoundToInt(baseDefense * defenseMult);
+        // CurrentHealth = Mathf.Min(Mathf.RoundToInt(baseMaxHealth * healthMult), ModifiedMaxHealth);
+    }
+
+    public void TickBuffs()
+    {
+        for (int i = activeBuffs.Count - 1; i >= 0; i--)
+        {
+            activeBuffs[i].turnsLeft--;
+            if (activeBuffs[i].turnsLeft <= 0)
+                activeBuffs.RemoveAt(i);
+        }
+        UpdateStatsWithBuffs();
+    }
+
+    // Example: call this at the start of each player turn
 }

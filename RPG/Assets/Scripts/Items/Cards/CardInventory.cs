@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CardInventory : MonoBehaviour
 {
@@ -48,5 +49,14 @@ public class CardInventory : MonoBehaviour
         carriedCard = cardItem;
         carriedCard.canvasGroup.blocksRaycasts = false;
         cardItem.transform.SetParent(draggableTransform);
+    }
+
+    public void ResetAllCardsForNewCombat()
+    {
+        foreach (var slot in cardSlots)
+        {
+            if (slot.myCardItem != null)
+                slot.myCardItem.ResetForNewCombat();
+        }
     }
 }

@@ -25,9 +25,9 @@ public class PlayerCombat : MonoBehaviour
 
     public void UpdatePlayerStats()
     {
-        currentDamage = PlayerManager.ModifiedDamage;
+        playerManager.ApplyBuffOrDebuff(CardStatType.Attack, multiplier, turns);
         currentMaxHealth = PlayerManager.ModifiedMaxHealth;
-        currentDefense = PlayerManager.ModifiedDefense;
+        playerManager.ApplyBuffOrDebuff(CardStatType.Defense, multiplier, turns);
         currentArmourPenetration = PlayerManager.ModifiedArmourPenetration;
         currentHealth = currentMaxHealth;
     }

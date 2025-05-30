@@ -17,7 +17,6 @@ public class CardInventorySlot : MonoBehaviour, IPointerClickHandler
     public void SetCard(CardInventoryItem cardItem)
     {
         CardInventory.Singleton.carriedCard = null;
-
         myCardItem = cardItem;
         myCardItem.activeSlot = this;
         myCardItem.transform.SetParent(transform);

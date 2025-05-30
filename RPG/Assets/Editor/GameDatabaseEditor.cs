@@ -25,9 +25,10 @@ public class GameDatabaseEditor : Editor
                 .Where(card => card != null)
                 .ToList();
 
-            string[] enemyGuids = AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/Enemies/Prefabs" });
-            db.allEnemies = enemyGuids
-                .Select(guid => AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(guid)))
+            // Update this section to find EnemyDefaultData ScriptableObjects
+            string[] enemyGuids = AssetDatabase.FindAssets("t:EnemyDefaultData", new[] { "Assets/Enemies" });
+            db.allEnemiesData = enemyGuids
+                .Select(guid => AssetDatabase.LoadAssetAtPath<EnemyDefaultData>(AssetDatabase.GUIDToAssetPath(guid)))
                 .Where(enemy => enemy != null)
                 .ToList();
 

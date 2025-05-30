@@ -8493,7 +8493,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1353450999
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9966,6 +9966,7 @@ MonoBehaviour:
   shopItemTwo: {fileID: 2004566055}
   shopItemThree: {fileID: 1422818163}
   pauseMenuUI: {fileID: 0}
+  eventUI: {fileID: 0}
   allShopItems: []
   availableShopItems:
   - {fileID: 0}

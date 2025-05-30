@@ -2,6 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum ItemRarity
+{
+    Common,
+    Uncommon,
+    Rare,
+    Epic,
+    Legendary
+}
 
 [CreateAssetMenu(menuName = "Item")]  // This attribute allows you to create instances of this class in the Unity editor
 public class Item : ScriptableObject
@@ -29,7 +37,7 @@ public class Item : ScriptableObject
     public int itemValue = 0;
     
     [Header("Item Rarity")]
-    public string itemRarity = "Common";
+    public ItemRarity itemRarity = ItemRarity.Common;
 
     [Header("Item Stats")]
     public int itemDamage = 0;

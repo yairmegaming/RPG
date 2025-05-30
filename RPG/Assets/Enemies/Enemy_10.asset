@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41dac8a457a607943b16965c585b1e49, type: 3}
+  m_Name: Enemy_10
+  m_EditorClassIdentifier: 
+  enemyID: enemy_10
+  enemyName: Enemy 10
+  enemySprite: {fileID: 0}
+  EnemyDamage: 5
+  EnemyHealth: 12
+  EnemyDefense: 3
+  EnemyScoreWorth: 5
+  rarity: 1
+  spawnChance: 90
+  rockChance: 44
+  paperChance: 32
+  scissorsChance: 24
